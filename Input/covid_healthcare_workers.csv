@@ -1,0 +1,5 @@
+﻿Country,Cases,% male,% female,Date,Source
+Italy,16991,32%,68%,16.Apr,https://www.epicentro.iss.it/coronavirus/bollettino/Bollettino-sorveglianza-integrata-COVID-19_16-aprile-2020.pdf
+USA,9282,27%,73%,09.Apr,https://www.cdc.gov/mmwr/volumes/69/wr/mm6915e6.htm?s_cid=mm6915e6_x
+Spain,23116,25%,75%,21.Apr,https://www.isciii.es/QueHacemos/Servicios/VigilanciaSaludPublicaRENAVE/EnfermedadesTransmisibles/Documents/INFORMES/Informes%20COVID-19/Informe%20n%C2%BA%2024.%20Situaci%C3%B3n%20de%20COVID-19%20en%20Espa%C3%B1a%20a%2021%20de%20abril%20de%202020.pdf
+Germany,7575,28%,72%,21.Apr,https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Situationsberichte/2020-04-21-en.pdf?_
