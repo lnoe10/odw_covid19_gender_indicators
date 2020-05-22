@@ -2,7 +2,7 @@ library(tidyverse)
 setwd("C:/Users/lnoe/Documents/R")
 
 # Import ODW master codes for merging and country groups
-odw_master_codes <- read_csv("Data/Input Data/ODW Country and Region Codes 2020 master sheet.csv") %>% 
+odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master sheet.csv") %>% 
   janitor::clean_names() %>% 
   # Clear out extra lines at the bottom that just contain notes
   filter(!is.na(country_name)) %>%
@@ -16,7 +16,7 @@ odw_master_codes <- read_csv("Data/Input Data/ODW Country and Region Codes 2020 
 
 
 # Import raw file and clean up variable names
-covid_deaths_cases_raw <- read_csv("Data/Input Data/GH5050 Covid-19 sex-disaggregated data tracker May20.csv") %>%
+covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker May20.csv") %>%
   janitor::clean_names() 
 
 # Create aggregates for UK out of weighted average of subcomponents.
@@ -115,7 +115,7 @@ covid_deaths_cases %>%
 
 
 # Compare to OWID Cases and Deaths
-owid <- read_csv("Data/Input Data/owid-covid-data_May20.csv") %>%
+owid <- read_csv("Input/owid-covid-data_May20.csv") %>%
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
   mutate(iso3c = case_when(
     country == "Kosovo" ~ "XKX",
@@ -135,7 +135,7 @@ owid %>%
 ### Age and Sex Disaggregation ####
 # Import countries that have sex AND age disaggregation for cases and deaths
 # Also from Global Health 5050
-covid_age_sex <- read_csv("Data/Input Data/gh_sex_age.csv") %>%
+covid_age_sex <- read_csv("Input/gh_sex_age.csv") %>%
   filter(country != "Scotland") %>%
   mutate(
     country = case_when(
