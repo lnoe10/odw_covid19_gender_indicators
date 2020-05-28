@@ -1,0 +1,104 @@
+Country,Sex-disaggregated?,Date,Cases,Cases (% male),Cases (% female),Deaths,deaths (% male),deaths (% female),Deaths among confirmed cases (male),Deaths in confirmed cases (female),Deaths in confirmed cases (Male:female ratio),Sources
+Thailand,Yes,24.05.2020,"3,040",54,46,56,77,23,2.60%,0.90%,2.8,Source
+The Netherlands,Yes,26.05.2020,"45,488",37,63,"5,856",55,45,19.30%,9.10%,2.1,Source
+Dominican Republic,Yes,25.05.2020,"15,264",54,46,468,71,29,4.00%,2.00%,2,Source
+Greece,Yes,25.05.2020,"2,685",55,45,172,70,30,8.20%,4.20%,1.9,Source
+Belgium,Yes,25.05.2020,"57,221",37,63,"6,645",51,49,16.00%,9.10%,1.8,Source
+Denmark,Yes,26.05.2020,"11,428",42,58,563,56,44,6.60%,3.70%,1.8,Source
+Romania,Yes,24.05.2020,"16,911",45,55,"1,187",59,41,9.20%,5.20%,1.8,Source
+Spain,Yes,21.05.2020,"248,335",43,57,"20,527",57,43,10.90%,6.30%,1.8,Source
+Sweden,Yes,27.05.2020,"34,440",41,59,"4,125",55,45,16.10%,9.10%,1.8,Source
+Peru,Yes,25.05.2020,"123,979",59,42,"3,629",72,28,3.60%,2.00%,1.8,Source
+Bosnia and Herzegovina,Yes,13.05.2020,994,45,55,37,59,41,4.90%,2.80%,1.8,Source
+China,Yes,28.02.2020,"55,924",51,49,"2,114",64,36,4.70%,2.80%,1.7,Source
+Italy,Yes,20.05.2020,"227,169",46,54,"31,017",59,41,17.60%,10.30%,1.7,Source
+Northern Ireland,Yes,26.05.2020,"4,630",38,62,513,52,48,14.90%,8.70%,1.7,Source
+England,Yes,20.05.2020,"143,726",46,54,"31,818",59,41,28.20%,16.90%,1.7,Source
+Ecuador,Yes,25.05.2020,"28,399",56,44,"3,203",66,34,13.50%,8.50%,1.6,Source
+South Korea,Yes,26.05.2020,"11,225",42,58,269,53,47,3.00%,1.90%,1.6,Source
+Switzerland,Yes,27.05.2020,"30,748",46,54,"1,649",58,42,6.70%,4.20%,1.6,Source
+Mexico,Yes,25.05.2020,"71,105",57,43,"7,633",68,32,12.80%,8.10%,1.6,Source
+Scotland,Yes,25.05.2020,"15,148",38,62,"3,779",50,50,32.70%,20.10%,1.6,Source
+Ukraine,Yes,28.04.2020,"9,410",44,56,239,55,45,3.20%,2.00%,1.6,Source
+South Africa,Yes,25.05.2020,"23,409",42,58,480,54,46,2.60%,1.60%,1.6,Source
+Philippines,Yes,24.05.2020,"14,035",54,46,868,65,35,7.40%,4.80%,1.5,Source
+Austria,Yes,27.05.2020,"16,513",49,51,636,57,43,4.50%,3.20%,1.4,Source
+Czech Republic,Yes,25.05.2020,"8,778",49,51,317,58,42,4.30%,3.00%,1.4,Source
+Germany,Yes,26.05.2020,"179,002",48,52,"8,297",55,45,5.40%,4.00%,1.4,Source
+Indonesia,Yes,26.05.2020,"23,165",55,45,"1,418",63,37,7.00%,5.10%,1.4,Source
+Argentina,Yes,26.05.2020,"12,628",51,49,472,59,41,4.30%,3.10%,1.4,Source
+Chile,Yes,07.05.2020,"25,952",53,47,294,60,40,1.30%,1.00%,1.3,Source
+Portugal,Yes,25.05.2020,"31,007",42,58,"1,342",49,51,5.00%,3.80%,1.3,Source
+Republic of Ireland,Yes,24.05.2020,"24,591",43,57,"1,615",50,50,7.60%,5.80%,1.3,Source
+Colombia,Yes,25.05.2020,"21,981",56,44,750,62,38,3.80%,2.90%,1.3,Source
+Bangladesh,Yes,19.05.2020,"25,121",68,32,370,73,27,1.60%,1.20%,1.3,Source
+Australia,Yes,26.05.2020,"7,090",51,49,102,56,44,1.60%,1.30%,1.2,Source
+Luxembourg,Yes,25.05.2020,"3,995",51,49,110,55,45,3.00%,2.50%,1.2,Source
+Norway,Yes,26.05.2020,"8,364",50,50,235,54,46,3.10%,2.50%,1.2,Source
+Canada,Yes,25.05.2020,"41,647",45,55,"2,371",48,52,6.00%,5.50%,1.1,Source
+Iran,Yes,17.03.2020,"14,991",57,43,853,59,41,5.90%,5.40%,1.1,Source
+Estonia,Yes,27.05.2020,"1,836",44,56,66,47,53,3.80%,3.40%,1.1,Source
+Finland,Yes,26.05.2020,"6,628",49,51,285,47,53,4.10%,4.50%,0.9,Source
+Pakistan,Yes,27.05.2020,"59,151",78,22,"1,225",76,24,2.00%,2.20%,0.9,Source
+Slovenia,Yes,26.05.2020,"1,471",44,56,107,40,60,6.60%,7.80%,0.9,Source
+Maldives,Yes,26.05.2020,"1,457",85,15,5,80,20,0.30%,0.50%,0.7,Source
+Brazil,Partial,26.04.2020,,,,"3,611",59,41,,,,Source
+France,Partial,25.05.2020,,,,"18,049",59,41,,,,Source
+Israel,Partial,05.05.2020,,,,238,52,48,,,,Source
+Japan,Partial,26.05.2020,"16,019",55,45,,,,,,,Source
+Malaysia,Partial,26.05.2020,,,,115,77,23,,,,Source
+Poland,Partial,27.05.2020,,,,"1,023",51,49,,,,Source
+Russia,No,,,,,,,,,,,Source
+Saudi Arabia,Partial,26.05.2020,"76,726",75,25,,,,,,,Source
+Turkey,No,,,,,,,,,,,Source
+USA,Partial,20.05.2020,,,,"68,997",55,45,,,,Source
+India,Partial,30.04.2020,,,,"1,075",64,36,,,,Source
+Singapore,Partial,05.05.2020,"6,530",89,11,,,,,,,Source
+Qatar,Partial,28.04.2020,"12,156",91,9,,,,,,,Source
+Belarus,No,,,,,,,,,,,
+Panama,Partial,25.05.2020,"11,183",59,41,,,,,,,Source
+Egypt,No,,,,,,,,,,,Source
+UAE,No,,,,,,,,,,,Source
+Serbia,Partial,06.05.2020,,,,193,62,38,,,,Source
+Hungary,Partial,26.05.2020,,,,499,51,49,,,,Source
+Moldova,Partial,26.05.2020,"7,305",41,59,,,,,,,Source
+Algeria,Partial,19.05.2020,"7,377",56,44,,,,,,,Source
+Morocco,No,,,,,,,,,,,Source
+Cameroon,No,,,,,,,,,,,Source
+Oman,No,,,,,,,,,,,Source
+Croatia,Partial,21.05.2020,"2,243",46,54,,,,,,,Source
+Uzbekistan,No,,,,,,,,,,,Source
+Armenia,Partial,26.05.2020,,,,91,63,37,,,,Source
+Iceland,Partial,25.05.2020,"1,804",50,50,,,,,,,Source
+Afghanistan,No,,,,,,,,,,,Source
+Iraq,No,,,,,,,,,,,Source
+Nigeria,Partial,25.05.2020,"8,068",68,32,,,,,,,Source
+Azerbaijan,Partial,22.05.2020,"4,403",43,57,,,,,,,Source
+Ghana,Partial,27.05.2020,"7,117",60,40,,,,,,,Source
+Bahrain,Partial,27.05.2020,"3,460",86,14,,,,,,,Source
+Kazakstan,Partial,25.05.2020,"6,899",61,39,,,,,,,Source
+Kuwait,No,,,,,,,,,,,Source
+North Macedonia,Partial,27.05.2020,"1,941",49,51,,,,,,,Source
+New Zealand,Partial,26.05.2020,"1,503",44,56,,,,,,,Source
+Bolivia,No,,,,,,,,,,,Source
+Cuba,No,,,,,,,,,,,Source
+Guinea,No,,,,,,,,,,,Source
+Honduras,Partial,26.05.2020,"4,401",57,43,,,,,,,Source
+Sudan,No,,,,,,,,,,,Source
+Senegal,Partial,20.05.2020,736,52,48,,,,,,,Source
+Ivory Coast,No,,,,,,,,,,,Source
+Bulgaria,Partial,25.05.2020,"2,443",49,51,,,,,,,Source
+Wales,Partial,24.05.2020,"13,525",36,64,,,,,,,Source
+Dijbouti,Partial,07.04.2020,90,57,43,,,,,,,Source
+DRC,No,,,,,,,,,,,Source
+Gabon,No,,,,,,,,,,,Source
+El Salvidor,Partial,25.05.2020,"2,042",66,34,,,,,,,Source
+Somalia,Partial,26.05.2020,"1,711",71,29,,,,,,,Source
+Lithuania,No,,,,,,,,,,,Source
+Slovakia,Partial,20.05.2020,"1,472",50,50,,,,,,,Source
+Kenya,Partial,19.05.2020,963,62,38,,,,,,,Source
+Sri Lanka,No,,,,,,,,,,,Source
+Guinea-Bissau,No,,,,,,,,,,,
+Venezuela,Partial,26.05.2020,"1,211",54,46,,,,,,,Source
+Tajikistan,No,,,,,,,,,,,
+Guatemala,Partial,26.05.2020,"3,954",60,40,,,,,,,Source
