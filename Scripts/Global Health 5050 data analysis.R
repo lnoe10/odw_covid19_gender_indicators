@@ -22,7 +22,7 @@ covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data
 
 # Import Our World In Data Coronavirus data and clean, keeping latest value
 # Compare to OWID Cases and Deaths
-owid <- read_csv("Input/owid-covid-data_May28.csv") %>%
+owid <- read_csv("Input/owid-covid-data_May29.csv") %>%
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
   mutate(iso3c = case_when(
     country == "Kosovo" ~ "XKX",
@@ -84,6 +84,11 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
   bind_rows(uk_aggregate) %>%
   # Additinal clean and relevant indicators
   mutate(
+    country = case_when(
+      country == "Dijbouti" ~ "Djibouti",
+      country == "El Salvidor" ~ "El Salvador",
+      TRUE ~ country
+    ),
   iso3c = countrycode::countrycode(country, "country.name", "iso3c"),
   year = as.numeric(str_extract(date, "[0-9]{4}$")),
   month = as.numeric(str_extract(date, "(?<=\\.)[0-9]{2}(?=\\.)")),
@@ -104,7 +109,9 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
 # Population of sex-disaggregated countries. World pop in 2018: 7594270360
 covid_deaths_cases %>%
   group_by(sex_disaggregated) %>%
-  summarize(sum_pop = sum(pop, na.rm = TRUE))
+  summarize(sum_pop = sum(pop, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(share_pop = sum_pop/7594270360)
 
 # Number of countries with sex-disaggregation
 covid_deaths_cases %>%
