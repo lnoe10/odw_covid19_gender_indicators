@@ -95,6 +95,16 @@ pop_2019 <- read_csv("Input/WPP2019_TotalPopulationBySex.csv") %>%
   # filter out UK
   filter(iso3c != "GBR")
 
+# Create variables that hold total world population
+world_pop <- read_csv("Input/WPP2019_TotalPopulationBySex.csv") %>%
+  janitor::clean_names() %>%
+  filter(location == "World") %>%
+  mutate(pop_total = pop_total*1000, pop_male = pop_male*1000, pop_female = pop_female*1000)
+
+world_pop_total <- world_pop %>% pull(pop_total)
+world_pop_male <- world_pop %>% pull(pop_male)
+world_pop_female <- world_pop %>% pull(pop_female)
+
 ### ADDITIONAL PROCESSING ####
 
 # Creating master dataset out of GH5050 datasets
@@ -104,31 +114,67 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     country = case_when(
       country == "Dijbouti" ~ "Djibouti",
       country == "El Salvidor" ~ "El Salvador",
+      country == "Kazakstan" ~ "Kazakhstan",
       TRUE ~ country
     ),
   iso3c = countrycode::countrycode(country, "country.name", "iso3c"),
+  iso3c = case_when(
+    country == "England" ~ "ENG",
+    country == "Wales" ~ "WAL",
+    country == "Scotland" ~ "SCO",
+    country == "Northern Ireland" ~ "NIR",
+    TRUE ~ iso3c
+  ),
   year = as.numeric(str_extract(date, "[0-9]{4}$")),
   month = as.numeric(str_extract(date, "(?<=\\.)[0-9]{2}(?=\\.)")),
   day = as.numeric(str_extract(date, "^[0-9]{2}(?=\\.)")),
   source_name = "Global Health 50/50") %>%
-  # Drop any countries that we didn't get country codes for
-  filter(!is.na(iso3c)) %>%
   # Make sure we have no duplicates (older versions had them, so just to be safe)
   distinct(iso3c, .keep_all = TRUE) %>%
-  # Import population from WDI, replace with UN WPP for 2020?
-  left_join(WDI::WDI(indicator = c("pop" = "SP.POP.TOTL"), start = 2018, end = 2018, extra = TRUE) %>% 
-              select(iso3c, pop)) %>%
+  # Import population from UN WPP, see above
+  left_join(pop_2019 %>% select(-c(country))) %>%
   # Add country groups
-  left_join(odw_master_codes, by = c("iso3c"))
+  left_join(odw_master_codes %>% select(-c(country, un_code))) %>%
+  mutate(incgroup = as.character(incgroup),
+  incgroup = case_when(
+    iso3c == "ENG" ~ "High income",
+    iso3c == "WAL" ~ "High income",
+    iso3c == "SCO" ~ "High income",
+    iso3c == "NIR" ~ "High income",
+    TRUE ~ incgroup
+  ),
+  wbregion = case_when(
+    iso3c == "ENG" ~ "Europe & Central Asia",
+    iso3c == "WAL" ~ "Europe & Central Asia",
+    iso3c == "SCO" ~ "Europe & Central Asia",
+    iso3c == "NIR" ~ "Europe & Central Asia",
+    TRUE ~ incgroup
+  ),
+  odw_region_name = case_when(
+    iso3c == "ENG" ~ "Northern Europe",
+    iso3c == "WAL" ~ "Northern Europe",
+    iso3c == "SCO" ~ "Northern Europe",
+    iso3c == "NIR" ~ "Northern Europe",
+    TRUE ~ odw_region_name
+  ),
+  lending_cat = case_when(
+    iso3c == "ENG" ~ "..",
+    iso3c == "WAL" ~ "..",
+    iso3c == "SCO" ~ "..",
+    iso3c == "NIR" ~ "..",
+    TRUE ~ lending_cat
+  ))
 
 ### ANALYSIS ####
 
-# Population of sex-disaggregated countries. World pop in 2018: 7594270360
+# Population of sex-disaggregated countries.
+# Denominator of total pop for male, female and total pop comes from
+# 2019 totals for World from UN WPP 2019
 covid_deaths_cases %>%
   group_by(sex_disaggregated) %>%
-  summarize(sum_pop = sum(pop, na.rm = TRUE)) %>%
+  summarize(sum_pop = sum(pop_total, na.rm = TRUE)) %>%
   ungroup() %>%
-  mutate(share_pop = sum_pop/7594270360)
+  mutate(share_pop = sum_pop/world_pop_total)
 
 # Number of countries with sex-disaggregation
 covid_deaths_cases %>%
@@ -193,7 +239,7 @@ owid %>%
 covid_deaths_cases %>%
   left_join(covid_age_sex, by = c("iso3c")) %>%
   group_by(sex_age) %>%
-  summarize(sumpop = sum(pop, na.rm = TRUE), countries = n_distinct(iso3c))
+  summarize(sumpop = sum(pop_total, na.rm = TRUE), countries = n_distinct(iso3c))
 # Use world population to get share of people living in countries with sex AND age disaggregation
 # 431639358 + 818761165
 # 1250400523/7594270360
