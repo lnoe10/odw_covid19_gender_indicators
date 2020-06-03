@@ -97,38 +97,8 @@ pop_2019 <- read_csv("Input/WPP2019_TotalPopulationBySex.csv") %>%
 
 ### ADDITIONAL PROCESSING ####
 
-# For sex-disaggregated cases and deaths, create aggregates for 
-# UK out of weighted average of subcomponents to make country analysis easier
-# Will treat UK overall as having full sex disaggregation.
-# Check back as updates are made
-uk_aggregate <- covid_deaths_cases_raw %>%
-  # Keep just UK countries
-  filter(str_detect(country, "England|Wales|Scotland|Northern Ireland")) %>%
-  # Create weighted average by first creating total cases and deaths
-  mutate(num_cases_male = cases_percent_male/100*cases,
-         num_cases_female = cases_percent_female/100*cases,
-         num_deaths_male = deaths_percent_male/100*deaths,
-         num_deaths_female = deaths_percent_female/100*deaths) %>%
-  # Sum across all four countries
-  summarize(cases = sum(cases, na.rm = TRUE),
-            total_cases_male = sum(num_cases_male, na.rm = TRUE),
-            total_cases_female = sum(num_cases_female, na.rm = TRUE),
-            deaths = sum(deaths, na.rm = TRUE),
-            total_deaths_male = sum(num_deaths_male, na.rm = TRUE),
-            total_deaths_female = sum(num_deaths_female, na.rm = TRUE)) %>%
-  # Create relevant indicators and other variables that we need
-  mutate(cases_percent_male = round(total_cases_male/cases*100,0),
-         cases_percent_female = round(total_cases_female/cases*100,0),
-         deaths_percent_male = round(total_deaths_male/deaths*100,0),
-         deaths_percent_female = round(total_deaths_female/deaths*100,0),
-         country = "United Kingdom", sex_disaggregated = "Yes",
-         date = "12.05.20") %>%
-  select(-c(total_cases_male, total_cases_female, total_deaths_male, total_deaths_female))
-
-# Append back to dataset, dropping UK countries first, creating master dataset
+# Creating master dataset out of GH5050 datasets
 covid_deaths_cases <- covid_deaths_cases_raw %>%
-  filter(!str_detect(country, "England|Wales|Scotland|Northern Ireland")) %>%
-  bind_rows(uk_aggregate) %>%
   # Additinal clean and relevant indicators
   mutate(
     country = case_when(
