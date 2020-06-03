@@ -48,6 +48,53 @@ covid_age_sex <- read_csv("Input/gh_sex_age.csv") %>%
     ),
     iso3c = countrycode::countrycode(country, "country.name", "iso3c"))
 
+# Import 2019 Population from UN World Population prospects 2019
+# This is a filtered CSV of the "Total Population", "All variants" file
+# found here https://population.un.org/wpp/Download/Standard/CSV/
+# This is filtered for year (2019), as well as Variant (Medium)
+pop_2019 <- read_csv("Input/WPP2019_TotalPopulationBySex.csv") %>%
+  janitor::clean_names() %>%
+  # UN uses iso3 numeric country identifiers. Because we use iso3 character everywhere else,
+  # merge in ISO country name list, numeric, and character code from
+  # https://www.iso.org/obp/ui/#search click on country codes and search
+  # merging in with inner_join also keeps only those entities that are actual
+  # countries, since ISO list does not contain aggregates unlike UN WPP
+  inner_join(read_csv("Input/iso_name_char_code.csv") %>%
+               janitor::clean_names(), by = c("loc_id" = "numeric")) %>%
+  # Select only relevant variables
+  select(iso_num = loc_id, country = location, pop_male:pop_total, iso3c = alpha_3_code) %>%
+  # Because GH 5050 reports constitutent countries from UK separately, create sub-components for
+  # England, Wales, Northern Ireland, Scotland, using ONS data from
+  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2019
+  # Table 1 has first breakdown of UK populations across countries
+  # LOOK FOR UPDATES IN JUNE
+  add_row(country = c("England", "Wales", "Scotland", "Northern Ireland"),
+          iso3c = c("ENG", "WAL", "SCO", "NIR"),
+          pop_total = c(56286.961, 3152.879, 5463.300, 1893.667)) %>%
+  # Add male and female population for UK constituent countries
+  # using 2018 breakdown from
+  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/articles/ukpopulationpyramidinteractive/2020-01-08
+  mutate(pop_male = case_when(
+    iso3c == "ENG" ~ 0.494*pop_total,
+    iso3c == "WAL" ~ 0.493*pop_total,
+    iso3c == "SCO" ~ 0.487*pop_total,
+    iso3c == "NIR" ~ 0.492*pop_total,
+    TRUE ~ pop_male
+  ),
+  pop_female = case_when(
+    iso3c == "ENG" ~ pop_total - pop_male,
+    iso3c == "WAL" ~ pop_total - pop_male,
+    iso3c == "SCO" ~ pop_total - pop_male,
+    iso3c == "NIR" ~ pop_total - pop_male,
+    TRUE ~ pop_female
+  ),
+  # Convert all population estimates from thousands
+  pop_male = pop_male*1000,
+  pop_female = pop_female*1000,
+  pop_total = pop_total*1000) %>%
+  # filter out UK
+  filter(iso3c != "GBR")
+
 ### ADDITIONAL PROCESSING ####
 
 # For sex-disaggregated cases and deaths, create aggregates for 
