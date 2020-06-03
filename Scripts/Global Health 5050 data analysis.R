@@ -175,53 +175,43 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
 
 ### ANALYSIS ####
 
-# Population of sex-disaggregated countries.
-# Denominator of total pop for male, female and total pop comes from
-# 2019 totals for World from UN WPP 2019
-covid_deaths_cases %>%
-  group_by(sex_disaggregated) %>%
-  summarize(sum_pop = sum(pop_total, na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(share_pop = sum_pop/world_pop_total)
-
-# Number of countries with sex-disaggregation
-covid_deaths_cases %>%
-  count(sex_disaggregated)
+# Create master table of information for 1. Number of countries that
+# have sex-disaggreation or only 1 of each, 2. Number of cases
+# 3. case split between male and female, 4. Number of deaths, 5. death
+# split between male and female, 6. Share of world population by category
 
 # Covid cases male and female shares by groups
-covid_deaths_cases %>% 
-  # Create absolute number of cases
+(covid_deaths_cases %>% 
+  # Create absolute number of cases and deaths
   mutate(num_cases_male = cases_percent_male/100*cases, 
-         num_cases_female = cases_percent_female/100*cases) %>% 
-  # Take out places that have total cases, but don't have sex-disaggregated data 
-  # so we're not counting cases that don't have sex-disaggregation
-  filter(!is.na(num_cases_male)) %>% 
-  # Collapse to sum number of cases and sex-disaggregated cases
-  group_by(sex_disaggregated) %>% 
+         num_cases_female = cases_percent_female/100*cases,
+         num_deaths_male = deaths_percent_male/100*deaths, 
+         num_deaths_female = deaths_percent_female/100*deaths) %>% 
+  # Collapse to sum number of cases/deaths and sex-disaggregated cases/deaths
+  # By group
+  # Also create aggregate for population and count how many countries in each group
+  group_by(disaggregated_status) %>% 
   summarize(num_cases = sum(cases, na.rm = TRUE), 
             cases_male = sum(num_cases_male, na.rm = TRUE), 
-            cases_female = sum(num_cases_female, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  # Create shares of sex-disaggregated cases
-  mutate(pct_male = cases_male/num_cases, 
-         pct_fem = cases_female/num_cases)
-
-# Covid deaths male and female shares by groups
-covid_deaths_cases %>% 
-  mutate(num_deaths_male = deaths_percent_male/100*deaths, 
-         num_deaths_female = deaths_percent_female/100*deaths) %>% 
-  # Take out places that have total deaths, but don't have sex-disaggregated data 
-  # so we're not counting deaths that don't have sex-disaggregation
-  filter(!is.na(num_deaths_male)) %>% 
-  # Collapse to sum number of deaths and sex-disaggregated deaths
-  group_by(sex_disaggregated) %>% 
-  summarize(num_deaths = sum(deaths, na.rm = TRUE), 
+            cases_female = sum(num_cases_female, na.rm = TRUE),
+            num_deaths = sum(deaths, na.rm = TRUE), 
             deaths_male = sum(num_deaths_male, na.rm = TRUE), 
-            deaths_female = sum(num_deaths_female, na.rm = TRUE)) %>% 
+            deaths_female = sum(num_deaths_female, na.rm = TRUE),
+            sum_pop = sum(pop_total, na.rm = TRUE),
+            countries = n_distinct(iso3c)) %>% 
   ungroup() %>% 
-  # Create shares of sex-disaggregated deaths
-  mutate(pct_male = deaths_male/num_deaths, 
-         pct_fem = deaths_female/num_deaths)
+  # Create shares of sex-disaggregated cases/deaths and share of population
+  mutate(pct_male_c = cases_male/num_cases, 
+         pct_fem_c = cases_female/num_cases,
+         pct_male_d = deaths_male/num_deaths, 
+         pct_fem_d = deaths_female/num_deaths,
+         share_pop = sum_pop/world_pop_total) %>%
+  filter(disaggregated_status != "None") %>%
+  janitor::adorn_totals() %>%
+  select(disaggregated_status, countries, num_cases, pct_male_c, pct_fem_c,
+         num_deaths, pct_male_d, pct_fem_d, share_pop) %>%
+  write_csv("Output/Table 1 - Sex-disaggregated data on the COVID-19 pandemic.csv", na = ""))
+
 
 # Totals By income group
 # Cases
