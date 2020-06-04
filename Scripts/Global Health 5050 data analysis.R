@@ -17,12 +17,12 @@ odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master she
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
 
 # Import Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
-covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker May28.csv") %>%
+covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker Jun04.csv") %>%
   janitor::clean_names() 
 
 # Import Our World In Data Coronavirus data and clean, keeping latest value
 # Compare to OWID Cases and Deaths
-owid <- read_csv("Input/owid-covid-data_May29.csv") %>%
+owid <- read_csv("Input/owid-covid-data_Jun04.csv") %>%
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
   mutate(iso3c = case_when(
     country == "Kosovo" ~ "XKX",
@@ -39,7 +39,7 @@ owid <- read_csv("Input/owid-covid-data_May29.csv") %>%
 
 # Import countries that have sex AND age disaggregation for cases and deaths
 # Also from Global Health 5050
-covid_age_sex <- read_csv("Input/gh_sex_age.csv") %>%
+covid_age_sex <- read_csv("Input/gh_sex_age_Jun04.csv") %>%
   filter(country != "Scotland") %>%
   mutate(
     country = case_when(
@@ -111,12 +111,6 @@ world_pop_female <- world_pop %>% pull(pop_female)
 covid_deaths_cases <- covid_deaths_cases_raw %>%
   # Additinal clean and relevant indicators
   mutate(
-    country = case_when(
-      country == "Dijbouti" ~ "Djibouti",
-      country == "El Salvidor" ~ "El Salvador",
-      country == "Kazakstan" ~ "Kazakhstan",
-      TRUE ~ country
-    ),
   iso3c = countrycode::countrycode(country, "country.name", "iso3c"),
   iso3c = case_when(
     country == "England" ~ "ENG",
@@ -183,18 +177,18 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
 # Covid cases male and female shares by groups
 covid_table_groups <- covid_deaths_cases %>% 
   # Create absolute number of cases and deaths
-  mutate(num_cases_male = cases_percent_male/100*cases, 
-         num_cases_female = cases_percent_female/100*cases,
-         num_deaths_male = deaths_percent_male/100*deaths, 
-         num_deaths_female = deaths_percent_female/100*deaths) %>% 
+  mutate(num_cases_male = cases_percent_male/100*total_cases, 
+         num_cases_female = cases_percent_female/100*total_cases,
+         num_deaths_male = deaths_percent_male/100*total_deaths, 
+         num_deaths_female = deaths_percent_female/100*total_deaths) %>% 
   # Collapse to sum number of cases/deaths and sex-disaggregated cases/deaths
   # By group
   # Also create aggregate for population and count how many countries in each group
   group_by(disaggregated_status) %>% 
-  summarize(num_cases = sum(cases, na.rm = TRUE), 
+  summarize(num_cases = sum(total_cases, na.rm = TRUE), 
             cases_male = sum(num_cases_male, na.rm = TRUE), 
             cases_female = sum(num_cases_female, na.rm = TRUE),
-            num_deaths = sum(deaths, na.rm = TRUE), 
+            num_deaths = sum(total_deaths, na.rm = TRUE), 
             deaths_male = sum(num_deaths_male, na.rm = TRUE), 
             deaths_female = sum(num_deaths_female, na.rm = TRUE),
             sum_pop = sum(pop_total, na.rm = TRUE),
@@ -237,6 +231,7 @@ covid_table_groups <- covid_deaths_cases %>%
                       pct_fem_d = weighted.mean(pct_fem_d, num_deaths)))) %>%
     write_csv("Output/Table 1 - Sex-disaggregated data on the COVID-19 pandemic.csv", na = ""))
 
+################# IN PROGRESS BELOW ################################
 
 # Totals By income group
 # Cases
