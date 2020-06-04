@@ -231,6 +231,59 @@ covid_table_groups <- covid_deaths_cases %>%
                       pct_fem_d = weighted.mean(pct_fem_d, num_deaths)))) %>%
     write_csv("Output/Table 1 - Sex-disaggregated data on the COVID-19 pandemic.csv", na = ""))
 
+
+# Create Table 2
+
+owid_working <- owid %>%
+  filter(country.x != "World") %>%
+  select(-country.y) %>%
+  rename(country = country.x) %>%
+  left_join(covid_deaths_cases %>%
+              filter(!iso3c %in% c("ENG", "WAL", "SCO", "NIR")) %>%
+              add_row(iso3c = "GBR", country = "United Kingdom", disaggregated_status = "Both") %>%
+              select(iso3c, disaggregated_status)) %>%
+  mutate(disaggregated_status = case_when(
+    disaggregated_status == "None" ~ NA_character_,
+    TRUE ~ disaggregated_status
+  ))
+
+owid_table <- owid_working %>%
+  mutate(cases_prov = total_cases, deaths_prov = total_deaths,
+         total_cases = case_when(
+           disaggregated_status == "Deaths only" ~ NA_real_,
+           TRUE ~ total_cases
+         ),
+         total_deaths = case_when(
+           disaggregated_status == "Cases only" ~ NA_real_,
+           TRUE ~ total_deaths
+         )) %>%
+  group_by(disaggregated_status) %>%
+  summarize(countries = n_distinct(iso3c), cases_total = sum(total_cases, na.rm = TRUE),
+            deaths_total = sum(total_deaths, na.rm = TRUE),
+            cases_prov = sum(cases_prov, na.rm = TRUE),
+            deaths_prov = sum(deaths_prov, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(all_cases = sum(cases_prov, na.rm = TRUE), all_deaths = sum(deaths_prov, na.rm = TRUE),
+         share_cases = cases_total/all_cases, share_deaths = deaths_total/all_deaths) %>%
+  select(disaggregated_status, countries, cases_total, share_cases, deaths_total, share_deaths)
+
+owid_table_2 <- owid_table %>%
+  filter(!is.na(disaggregated_status)) %>%
+  janitor::adorn_totals() %>%
+  bind_rows(owid_table %>%
+              filter(is.na(disaggregated_status)))
+(owid_table_2 %>%
+  bind_rows(owid_table_2 %>%
+              filter(is.na(disaggregated_status) | disaggregated_status == "Total") %>%
+              summarize(disaggregated_status = "Global Total",
+                        countries = sum(countries, na.rm = TRUE),
+                        cases_total = sum(cases_total, na.rm = TRUE),
+                        share_cases = sum(share_cases, na.rm = TRUE),
+                        deaths_total = sum(deaths_total, na.rm = TRUE),
+                        share_deaths = sum(share_deaths, na.rm = TRUE))) %>%
+  write_csv("Output/Table 2 - Global data on COVID-19 cases and deaths.csv", na = ""))
+
+
 ################# IN PROGRESS BELOW ################################
 
 # Totals By income group
