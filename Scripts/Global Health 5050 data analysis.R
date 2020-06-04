@@ -181,7 +181,7 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
 # split between male and female, 6. Share of world population by category
 
 # Covid cases male and female shares by groups
-(covid_deaths_cases %>% 
+covid_table_groups <- covid_deaths_cases %>% 
   # Create absolute number of cases and deaths
   mutate(num_cases_male = cases_percent_male/100*cases, 
          num_cases_female = cases_percent_female/100*cases,
@@ -207,10 +207,35 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
          pct_fem_d = deaths_female/num_deaths,
          share_pop = sum_pop/world_pop_total) %>%
   filter(disaggregated_status != "None") %>%
-  janitor::adorn_totals() %>%
+#  janitor::adorn_totals() %>%
   select(disaggregated_status, countries, num_cases, pct_male_c, pct_fem_c,
-         num_deaths, pct_male_d, pct_fem_d, share_pop) %>%
-  write_csv("Output/Table 1 - Sex-disaggregated data on the COVID-19 pandemic.csv", na = ""))
+         num_deaths, pct_male_d, pct_fem_d, share_pop)
+
+### Create table
+# Starting with three rows we already have (Both, Cases only, Deaths only)
+(covid_table_groups %>%
+      # Append a row made up of sums and weighted averages
+      bind_rows(
+        # This row is made up of 3 segments
+        bind_cols(
+          # A segment of sums: Number of countries with any disaggregation
+          # Total number of cases, deaths, and share of world population
+          covid_table_groups %>%
+            summarize(disaggregated_status = "Total", countries = sum(countries, na.rm = TRUE),
+                      num_cases = sum(num_cases, na.rm = TRUE),
+                      num_deaths = sum(num_deaths, na.rm = TRUE),
+                      share_pop = sum(share_pop, na.rm = TRUE)),
+          # A segment of weighted average male and female case prevalence
+          covid_table_groups %>%
+            filter(!is.nan(pct_male_c)) %>%
+            summarize(pct_male_c = weighted.mean(pct_male_c, num_cases),
+                      pct_fem_c = weighted.mean(pct_fem_c, num_cases)),
+          # A segment of weighted average male and female death prevalence
+          covid_table_groups %>%
+            filter(!is.nan(pct_male_d)) %>%
+            summarize(pct_male_d = weighted.mean(pct_male_d, num_deaths),
+                      pct_fem_d = weighted.mean(pct_fem_d, num_deaths)))) %>%
+    write_csv("Output/Table 1 - Sex-disaggregated data on the COVID-19 pandemic.csv", na = ""))
 
 
 # Totals By income group
