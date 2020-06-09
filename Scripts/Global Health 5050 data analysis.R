@@ -251,6 +251,11 @@ owid_working <- owid %>%
   mutate(disaggregated_status = case_when(
     disaggregated_status == "None" ~ NA_character_,
     TRUE ~ disaggregated_status
+  ),
+  # Add indicator on whether indicator is from GH5050 or not to summarize later for income and region groups for Table 3
+  gh_status = case_when(
+    disaggregated_status %in% c("Both", "Cases only", "Deaths only") ~ "gh",
+    TRUE ~ "other"
   ))
 
 # Create interim df that summarizes number of cases and deaths by
@@ -290,6 +295,57 @@ owid_working <- owid %>%
               janitor::adorn_totals(name = "Global Total") %>%
               # Keep just total line
               filter(disaggregated_status == "Global Total")) %>%
+    # Rename "Neither" category to better label
+    mutate(disaggregated_status = case_when(
+      is.na(disaggregated_status) ~ "Countries w/o sex disaggregation",
+      TRUE ~ disaggregated_status
+    )) %>%
+    write_csv("Output/Table 2 - Global data on COVID-19 cases and deaths.csv", na = ""))
+
+
+
+### Table 3
+
+# Create interim df that summarizes number of cases and deaths by
+# income groups around source: GH5050 and Other
+(owid_table_3 <- owid_working %>%
+    group_by(gh_status, incgroup) %>%
+    # Note we are keeping cases and deaths for countries that have
+    # deaths only/cases only disaggregated instead of dropping them
+    # In the blog, we mark them and discuss that these cases/deaths are not
+    # actually sex-disaggregated. However, to avoid confusion, we keep them in the same
+    # country group line. Need better solution in the future.
+    summarize(cases_total = sum(total_cases, na.rm = TRUE),
+              deaths_total = sum(total_deaths, na.rm = TRUE)) %>%
+    ungroup() %>%
+    pivot_wider(id_cols = "incgroup", names_from = "gh_status", values_from = cases_total:deaths_total) %>%
+    mutate(total_cases = rowSums(select(., matches("cases")) , na.rm = TRUE),
+           total_deaths = rowSums(select(., matches("deaths")) , na.rm = TRUE),
+           share_cases = cases_total_gh/total_cases, share_deaths = deaths_total_gh/total_deaths) %>%
+    select(incgroup, total_cases, share_cases, total_deaths, share_deaths))
+
+### IN PROGRESS FOR TABLE 3 ####
+
+# Put in sub-totals of Both, Cases only, and deaths only disaggregations
+(owid_table_2 <- owid_table %>%
+    # Take out the "Neither" line
+    filter(!is.na(disaggregated_status)) %>%
+    # The function below will put in totals of all the columns, called "Total"
+    janitor::adorn_totals(name = "Sub-Total") %>%
+    # Append the "Neither" row from the df back
+    bind_rows(owid_table %>%
+                filter(is.na(disaggregated_status))))
+
+# Add final line that adds sub-total to "Neither" info and creates Global total
+(owid_table_2 %>%
+    # Append total of sub-total and "Neither" category
+    bind_rows(owid_table_2 %>%
+                # Keep just sub-total and "Neither" group
+                filter(is.na(disaggregated_status) | disaggregated_status == "Sub-Total") %>%
+                # Use janitor function to create total line, specifying the name to avoid confusion with sub-total
+                janitor::adorn_totals(name = "Global Total") %>%
+                # Keep just total line
+                filter(disaggregated_status == "Global Total")) %>%
     # Rename "Neither" category to better label
     mutate(disaggregated_status = case_when(
       is.na(disaggregated_status) ~ "Countries w/o sex disaggregation",
