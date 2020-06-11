@@ -17,12 +17,12 @@ odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master she
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
 
 # Import Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
-covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker Jun04.csv") %>%
+covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker Jun11.csv") %>%
   janitor::clean_names() 
 
 # Import Our World In Data Coronavirus data and clean, keeping latest value
 # Compare to OWID Cases and Deaths
-owid <- read_csv("Input/owid-covid-data_Jun04.csv") %>%
+owid <- read_csv("Input/owid-covid-data_Jun11.csv") %>%
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
   mutate(iso3c = case_when(
     country == "Kosovo" ~ "XKX",
@@ -109,8 +109,11 @@ world_pop_female <- world_pop %>% pull(pop_female)
 
 # Creating master dataset out of GH5050 datasets
 covid_deaths_cases <- covid_deaths_cases_raw %>%
-  # Additinal clean and relevant indicators
+  # Additional clean and add relevant indicators
   mutate(
+    country = case_when(
+      country == "Central Africal Republic" ~ "Central African Republic",
+      TRUE ~ country),
   iso3c = countrycode::countrycode(country, "country.name", "iso3c"),
   iso3c = case_when(
     country == "England" ~ "ENG",
