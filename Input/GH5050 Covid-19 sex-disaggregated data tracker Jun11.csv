@@ -1,0 +1,116 @@
+Country,Sex-disaggregated?,Date,Total cases,Cases (% male),Cases (% female),Total deaths,deaths (% male),deaths (% female),Proportion of deaths in confirmed cases (total),Proportion of deaths in confirmed cases (male),Proportion of deaths in confirmed cases (female),Proportion of deaths in confirmed cases (Male:female ratio),Sources
+Costa Rica,Yes,08.06.2020,"1,342",53,47,9,90,10,0.8,1.3,0.2,7.9,Source
+Haiti,Yes,07.06.2020,"3,662",60,41,45,80,20,1.5,2.1,0.8,2.8,Source
+Thailand,Yes,08.06.2020,"3,119",55,45,58,76,24,1.9,2.6,1,2.6,Source
+North Macedonia,Yes,09.06.2020,"3,152",49,51,156,67,32,5,7.1,3.1,2.3,Source
+The Netherlands,Yes,09.06.2020,"47,811",37,63,"6,031",55,45,12.6,18.7,9,2.1,Source
+Albania,Yes,08.06.2020,"1,299",48,52,22,65,35,2.6,3.5,1.8,2,Source
+Greece,Yes,09.06.2020,"2,856",55,45,183,69,31,6.4,8.1,4.4,1.9,Source
+Dominican Republic,Yes,07.06.2020,"20,126",54,46,539,70,30,2.7,3.4,1.8,1.9,Source
+Belgium,Yes,09.06.2020,"59,110",37,63,"6,852",51,49,11.6,15.9,9.1,1.8,Source
+Denmark,Yes,10.06.2020,"11,962",42,58,593,56,44,5,6.6,3.7,1.8,Source
+Romania,Yes,07.06.2020,"20,578",44,56,"1,333",59,41,6.5,8.6,4.8,1.8,Source
+Spain,Yes,21.05.2020,"248,335",43,57,"20,527",57,43,8.3,10.9,6.3,1.8,Source
+Sweden,Yes,09.06.2020,"45,924",40,60,"4,717",55,45,10.3,14.1,7.7,1.8,Source
+Northern Ireland,Yes,09.06.2020,"4,796",38,62,536,52,48,11.2,15.3,8.7,1.8,Source
+Bosnia and Herzegovina,Yes,13.05.2020,994,45,55,37,59,40,3.7,4.9,2.8,1.8,Source
+England,Yes,03.06.2020,"214,191",43,57,"35,430",57,42,16.5,22.1,12.3,1.8,Source
+China,Yes,28.02.2020,"55,924",51,49,"2,114",64,36,3.8,4.7,2.8,1.7,Source
+Italy,Yes,03.06.2020,"234,086",46,54,"32,354",59,41,13.8,17.7,10.5,1.7,Source
+Peru,Yes,08.06.2020,"199,696",59,41,"5,571",71,29,2.8,3.3,2,1.7,Source
+Ecuador,Yes,29.05.2020,"29,615",56,44,"3,334",66,34,11.3,13.5,8.5,1.6,Source
+South Korea,Yes,09.06.2020,"11,852",42,58,274,53,47,2.3,2.9,1.9,1.6,Source
+Switzerland,Yes,09.06.2020,"30,963",46,54,"1,663",58,42,5.4,6.8,4.2,1.6,Source
+Mexico,Yes,08.06.2020,"120,102",56,44,"14,053",66,34,11.7,13.9,8.9,1.6,Source
+Scotland,Yes,08.06.2020,"15,632",38,62,"4,000",50,50,25.6,33.7,20.6,1.6,Source
+Ukraine,Yes,28.04.2020,"9,410",44,56,239,55,45,2.5,3.2,2,1.6,Source
+South Africa,Yes,09.06.2020,"52,601",43,57,"1,161",52,48,2.2,2.7,1.8,1.5,Source
+Austria,Yes,09.06.2020,"16,902",49,51,672,57,43,4,4.6,3.4,1.4,Source
+Czech Republic,Yes,09.06.2020,"9,412",50,50,328,59,41,3.5,4.1,2.9,1.4,Source
+Germany,Yes,09.06.2020,"184,457",48,52,"8,706",55,45,4.7,5.5,4,1.4,Source
+Indonesia,Yes,09.06.2020,"33,076",54,46,"1,923",62,38,5.8,6.7,4.8,1.4,Source
+Philippines,Yes,09.06.2020,"22,474",56,44,"1,011",63,37,4.5,5.1,3.7,1.4,Source
+Bangladesh,Yes,09.06.2020,"71,675",71,29,975,77,23,1.4,1.5,1.1,1.4,Source
+Chile,Yes,07.05.2020,"25,952",53,47,294,60,40,1.1,1.3,1,1.3,Source
+Portugal,Yes,08.06.2020,"34,885",43,57,"1,485",50,50,4.3,4.9,3.8,1.3,Source
+Republic of Ireland,Yes,06.06.2020,"25,165",43,57,"1,683",49,51,6.7,7.7,5.9,1.3,Source
+Argentina,Yes,08.06.2020,"22,794",51,50,670,57,43,2.9,3.3,2.6,1.3,Source
+Colombia,Yes,08.06.2020,"40,719",55,45,"1,308",61,39,3.2,3.6,2.8,1.3,Source
+Australia,Yes,09.06.2020,"7,398",51,49,102,56,44,1.4,1.5,1.2,1.2,Source
+Luxembourg,Yes,08.06.2020,"4,046",51,49,110,56,44,2.7,3,2.5,1.2,Source
+Norway,Yes,10.06.2020,"8,576",50,50,239,54,46,2.8,3,2.6,1.2,Source
+Canada,Yes,09.06.2020,"95,874",43,57,"7,820",46,54,8.2,8.6,7.8,1.1,Source
+Iran,Yes,17.03.2020,"14,991",57,43,853,59,41,5.7,5.9,5.4,1.1,Source
+Estonia,Yes,10.06.2020,"1,953",45,55,69,46,53,3.5,3.7,3.4,1.1,Source
+Pakistan,Yes,09.06.2020,"108,350",74,26,"2,172",74,26,2,2,2,1,Source
+Finland,Yes,09.06.2020,"7,025",49,51,315,48,52,4.5,4.3,4.6,0.9,Source
+Slovenia,Yes,08.06.2020,"1,486",44,56,108,41,59,7.3,6.7,7.7,0.9,Source
+Maldives,Yes,09.06.2020,"1,942",85,15,8,75,25,0.4,0.4,0.7,0.5,Source
+Brazil,Partial,26.04.2020,,,,"3,611",59,41,,,,,Source
+France,Partial,08.06.2020,,,,"18,792",59,41,,,,,Source
+Israel,Partial,05.05.2020,,,,238,52,48,,,,,Source
+Japan,Partial,07.06.2020,"16,584",55,45,,,,,,,,Source
+Malaysia,Partial,07.06.2020,,,,117,77,23,,,,,Source
+Poland,Partial,09.06.2020,,,,"1,182",51,49,,,,,Source
+Russia,No,,,,,,,,,,,,Source
+Saudi Arabia,Partial,26.05.2020,"76,726",75,25,,,,,,,,Source
+Turkey,No,,,,,,,,,,,,Source
+USA,Partial,03.06.2020,,,,"88,241",54,46,,,,,Source
+India,Partial,30.04.2020,,,,"1,075",64,36,,,,,Source
+Singapore,Partial,05.05.2020,"6,530",89,11,,,,,,,,Source
+Qatar,Partial,28.04.2020,"12,156",91,9,,,,,,,,Source
+Belarus,No,,,,,,,,,,,,Source
+Panama,Partial,08.06.2020,"16,854",58,42,,,,,,,,Source
+Egypt,No,,,,,,,,,,,,Source
+UAE,No,,,,,,,,,,,,Source
+Serbia,Partial,06.05.2020,,,,193,62,38,,,,,Source
+Hungary,Partial,09.06.2020,,,,550,49,51,,,,,Source
+Moldova,Partial,10.06.2020,"10,025",41,59,,,,,,,,Source
+Algeria,Partial,08.06.2020,"10,265",54,46,,,,,,,,Source
+Morocco,No,,,,,,,,,,,,Source
+Cameroon,No,,,,,,,,,,,,Source
+Oman,No,,,,,,,,,,,,Source
+Croatia,Partial,04.06.2020,"2,247",46,54,,,,,,,,Source
+Uzbekistan,No,,,,,,,,,,,,Source
+Armenia,Partial,09.06.2020,,,,217,59,42,,,,,Source
+Iceland,Partial,07.06.2020,"1,806",50,50,,,,,,,,Source
+Afghanistan,No,,,,,,,,,,,,Source
+Iraq,No,,,,,,,,,,,,Source
+Nigeria,Partial,09.06.2020,"13,464",68,32,,,,,,,,Source
+Azerbaijan,Partial,09.06.2020,"8,191",46,54,,,,,,,,Source
+Ghana,Partial,10.06.2020,"10,201",58,42,,,,,,,,Source
+Bahrain,Partial,10.06.2020,"5,873",88,12,,,,,,,,Source
+Kazakhstan,Partial,08.06.2020,"9,452",61,39,,,,,,,,Source
+Kuwait,No,,,,,,,,,,,,Source
+New Zealand,Partial,10.06.2020,"1,504",44,56,,,,,,,,Source
+Bolivia,No,,,,,,,,,,,,Source
+Cuba,Partial,10.06.2020,"2,211",51,49,,,,,,,,Source
+Guinea,No,,,,,,,,,,,,Source
+Honduras,Partial,08.06.2020,"6,450",58,42,,,,,,,,Source
+Sudan,No,,,,,,,,,,,,Source
+Senegal,Partial,20.05.2020,736,52,48,,,,,,,,Source
+Ivory Coast,No,,,,,,,,,,,,Source
+Bulgaria,Partial,25.05.2020,"2,443",49,51,,,,,,,,Source
+Wales,Partial,08.06.2020,"14,448",36,64,,,,,,,,Source
+Djibouti,Partial,02.06.2020,"3,779",68,32,,,,,,,,Source
+DRC,No,,,,,,,,,,,,Source
+Gabon,No,,,,,,,,,,,,Source
+El Salvador,Partial,08.06.2020,"3,191",68,32,,,,,,,,Source
+Somalia,Partial,09.06.2020,"2,397",72,28,,,,,,,,Source
+Lithuania,Partial,09.06.2020,"1,727",42,58,,,,,,,,Source
+Slovakia,Partial,28.05.2020,"1,491",50,50,,,,,,,,Source
+Kenya,Partial,09.06.2020,"2,979",68,32,,,,,,,,Source
+Sri Lanka,No,,,,,,,,,,,,Source
+Guinea-Bissau,No,,,,,,,,,,,,Source
+Venezuela,Partial,08.06.2020,"2,473",55,45,,,,,,,,Source
+Tajikistan,No,,,,,,,,,,,,Source
+Guatemala,Partial,08.06.2020,"7,502",61,39,,,,,,,,Source
+Nepal,Partial,09.06.2020,"4,085",93,7,,,,,,,,Source
+Mali,No,,,,,,,,,,,,Source
+Central Africal Republic,Partial,08.06.2020,"1,850",75,25,,,,,,,,Source
+Ethiopia,Partial,08.06.2020,"2,336",66,35,,,,,,,,Source
+Kyrgyzstan,Partial,08.06.2020,"2,032",49,51,,,,,,,,Source
+Lebanon,Partial,09.06.2020,"1,368",58,42,,,,,,,,Source
+Paraguay,Partial,08.06.2020,"1,145",69,31,,,,,,,,Source
+South Sudan,No,,,,,,,,,,,,Source
+Zambia,No,,,,,,,,,,,,Source
