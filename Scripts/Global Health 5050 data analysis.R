@@ -3,6 +3,11 @@ library(tidyverse)
 
 ### IMPORT RAW DATA ####
 
+# Set date variables to toggle between versions of data to import.
+# Using 3 letter month, 2 digit day format
+month <- "Jun"
+day <- "11"
+
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master sheet.csv") %>%
   # Clean all variable names by converting to snake case
@@ -19,11 +24,11 @@ odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master she
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
 
 # Import Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
-covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker Jun11.csv") %>%
+covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day,".csv")) %>%
   janitor::clean_names() 
 
 # Import Our World In Data Coronavirus data and clean, keeping latest value
-owid <- read_csv("Input/owid-covid-data_Jun11.csv") %>%
+owid <- read_csv(str_c("Input/owid-covid-data_", month, day, ".csv")) %>%
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
   # replace iso3 value for Kosovo with version that World Bank uses for merging.
   mutate(iso3c = case_when(
