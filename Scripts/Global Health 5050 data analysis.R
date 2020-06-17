@@ -5,13 +5,13 @@ library(tidyverse)
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master sheet.csv") %>%
-  #Explain what clean_names() does? - DC 
+  # Clean all variable names by converting to snake case
   janitor::clean_names() %>% 
   # Clear out extra lines at the bottom that just contain notes
   filter(!is.na(country_name)) %>%
   # Clear out duplicate Faroe Islands
   distinct(iso_3_code, .keep_all = TRUE) %>%
-  # Describe these steps? - DC 
+  # Keep only relevant indicators and rename for clarity 
   select(iso3c = iso_3_code, country = country_name, odw_region_name, un_code = un_m49_code,
          incgroup = world_bank_income_group_name, lending_cat = world_bank_lending_code_june_2019,
          wbregion = world_bank_all_income_region_names) %>%
@@ -23,13 +23,9 @@ covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data
   janitor::clean_names() 
 
 # Import Our World In Data Coronavirus data and clean, keeping latest value
-# Compare to OWID Cases and Deaths
-
-# I don't know how you update the input data but perhaps there is a way
-# to replace "Jun11.csv" with a more automated naming scheme? - DC 
 owid <- read_csv("Input/owid-covid-data_Jun11.csv") %>%
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
-  # what's going on with Kosovo? - DC 
+  # replace iso3 value for Kosovo with version that World Bank uses for merging.
   mutate(iso3c = case_when(
     country == "Kosovo" ~ "XKX",
     TRUE ~ iso3c
@@ -216,8 +212,6 @@ covid_table_groups <- covid_deaths_cases %>%
          pct_fem_d = deaths_female/num_deaths,
          share_pop = sum_pop/world_pop_total) %>%
   filter(disaggregated_status != "None") %>%
-  # Why is janitor commented out? - DC 
-#  janitor::adorn_totals() %>%
   select(disaggregated_status, countries, num_cases, pct_male_c, pct_fem_c,
          num_deaths, pct_male_d, pct_fem_d, share_pop)
 
@@ -316,10 +310,6 @@ owid_working <- owid %>%
       TRUE ~ disaggregated_status
     )) %>%
     write_csv("Output/Table 2 - Global data on COVID-19 cases and deaths.csv", na = ""))
-
-## AFTER RUNNING ABOVE CODE - I get error message:
-#"Error in janitor::adorn_totals(., name = "Global Total") : 
-#  trying to re-add a totals dimension that is already been added" - DC 
 
 ### Table 3 Cases and Deaths by Income Group
 
