@@ -245,8 +245,8 @@ covid_table_groups <- covid_deaths_cases %>%
 
 # Merge OWID data with list of GH5050 countries and their sex-disaggregation status
 owid_working <- owid %>%
-  # Take out World aggregate
-  filter(country.x != "World") %>%
+  # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
+  filter(!country.x %in% c("World", "International")) %>%
   # Clean country name variables
   select(-country.y) %>%
   rename(country = country.x) %>%
@@ -259,11 +259,6 @@ owid_working <- owid %>%
   mutate(disaggregated_status = case_when(
     disaggregated_status == "None" ~ NA_character_,
     TRUE ~ disaggregated_status
-  ),
-  # Add indicator on whether indicator is from GH5050 or not to summarize later for income and region groups for Table 3
-  gh_status = case_when(
-    disaggregated_status %in% c("Both", "Cases only", "Deaths only") ~ "gh",
-    TRUE ~ "other"
   ))
 
 # Create interim df that summarizes number of cases and deaths by
