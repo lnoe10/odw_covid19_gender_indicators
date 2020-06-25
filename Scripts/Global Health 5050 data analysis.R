@@ -238,7 +238,7 @@ covid_table_groups <- covid_deaths_cases %>%
             filter(!is.nan(pct_male_d)) %>%
             summarize(pct_male_d = weighted.mean(pct_male_d, num_deaths),
                       pct_fem_d = weighted.mean(pct_fem_d, num_deaths)))) %>%
-    write_csv("Output/Table 1 - Sex-disaggregated data on the COVID-19 pandemic.csv", na = ""))
+    write_csv(str_c("Output/Table 1 - Sex-disaggregated data on the COVID-19 pandemic_", month, day, ".csv"), na = ""))
 
 
 ### Table 2
@@ -308,7 +308,7 @@ owid_working <- owid %>%
       is.na(disaggregated_status) ~ "Countries w/o sex disaggregation",
       TRUE ~ disaggregated_status
     )) %>%
-    write_csv("Output/Table 2 - Global data on COVID-19 cases and deaths.csv", na = ""))
+    write_csv(str_c("Output/Table 2 - Global data on COVID-19 cases and deaths_", month, day, ".csv"), na = ""))
 
 ### Table 3 Cases and Deaths by Income Group
 
@@ -348,7 +348,7 @@ owid_working <- owid %>%
     incgroup == "Total" ~ total_ghdeaths/total_deaths,
     TRUE ~ share_deaths
   )) %>%
-  write_csv("Output/Table 3 - Sex-disaggregated COVID-19 cases and deaths by income group.csv", na = ""))
+  write_csv(str_c("Output/Table 3 - Sex-disaggregated COVID-19 cases and deaths by income group_", month, day, ".csv"), na = ""))
 
 
 ### Table 4 Cases and Deaths by Region
@@ -388,7 +388,7 @@ owid_working <- owid %>%
       wbregion == "Total" ~ total_ghdeaths/total_deaths,
       TRUE ~ share_deaths
     )) %>%
-    write_csv("Output/Table 4 - Sex-disaggregated COVID-19 cases and deaths by region group.csv", na = ""))
+    write_csv(str_c("Output/Table 4 - Sex-disaggregated COVID-19 cases and deaths by region group_", month, day, ".csv"), na = ""))
 
 ################# Scratch space ################################
 
