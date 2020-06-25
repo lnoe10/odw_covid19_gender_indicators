@@ -72,29 +72,15 @@ pop_2019 <- read_csv("Input/WPP2019_TotalPopulationBySex.csv") %>%
   select(iso_num = loc_id, country = location, pop_male:pop_total, iso3c = alpha_3_code) %>%
   # Because GH 5050 reports constitutent countries from UK separately, create sub-components for
   # England, Wales, Northern Ireland, Scotland, using ONS data from
-  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2019
-  # Table 1 has first breakdown of UK populations across countries
-  # LOOK FOR UPDATES IN JUNE
+  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2019estimates
+  # Figure 3 population pyramid has 2019 population estimates and
+  # sex breakdown.
   add_row(country = c("England", "Wales", "Scotland", "Northern Ireland"),
           iso3c = c("ENG", "WAL", "SCO", "NIR"),
-          pop_total = c(56286.961, 3152.879, 5463.300, 1893.667)) %>%
-  # Add male and female population for UK constituent countries
-  # using 2018 breakdown from
-  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/articles/ukpopulationpyramidinteractive/2020-01-08
-  mutate(pop_male = case_when(
-    iso3c == "ENG" ~ 0.494*pop_total,
-    iso3c == "WAL" ~ 0.493*pop_total,
-    iso3c == "SCO" ~ 0.487*pop_total,
-    iso3c == "NIR" ~ 0.492*pop_total,
-    TRUE ~ pop_male
-  ),
-  pop_female = case_when(
-    iso3c == "ENG" ~ pop_total - pop_male,
-    iso3c == "WAL" ~ pop_total - pop_male,
-    iso3c == "SCO" ~ pop_total - pop_male,
-    iso3c == "NIR" ~ pop_total - pop_male,
-    TRUE ~ pop_female
-  ),
+          pop_total = c(56286.961, 3152.879, 5463.300, 1893.667),
+          pop_male = c(27827.831, 1554.678, 2663.003, 932.717),
+          pop_female = c(28459.130, 1598.201, 2800.297, 960.950)) %>%
+  mutate(
   # Convert all population estimates from thousands
   pop_male = pop_male*1000,
   pop_female = pop_female*1000,
@@ -121,6 +107,10 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     country = case_when(
       country == "Central Africal Republic" ~ "Central African Republic",
       TRUE ~ country),
+    # Assign country codes to countries. Will trigger warning that
+    # Some values were not matched unambiguously.
+    # This will be because nations of UK won't be matched, we're
+    # cleaning them separately below.
   iso3c = countrycode::countrycode(country, "country.name", "iso3c"),
   iso3c = case_when(
     country == "England" ~ "ENG",
@@ -176,10 +166,6 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     iso3c == "NIR" ~ "..",
     TRUE ~ lending_cat
   ))
-
-#After running above line of code, i get this warning message: 
-#some values were not matched unambiguously: England, 
-#Northern Ireland, Scotland, Wales - problem? DC 
 
 
 ### ANALYSIS ####
