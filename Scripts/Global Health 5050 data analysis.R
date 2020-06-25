@@ -6,7 +6,7 @@ library(tidyverse)
 # Set date variables to toggle between versions of data to import.
 # Using 3 letter month, 2 digit day format
 month <- "Jun"
-day <- "11"
+day <- "25"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master sheet.csv") %>%
@@ -130,7 +130,13 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     sex_disaggregated == "Partial" & !is.na(cases_percent_male) ~ "Cases only",
     sex_disaggregated == "Partial" & !is.na(deaths_percent_male) ~ "Deaths only",
     TRUE ~ "None"
-  )) %>%
+  ),
+  # Clean percent male and female for cases and deaths variables by removing
+  # percent sign
+  cases_percent_male = as.numeric(str_remove(cases_percent_male, "%")),
+  cases_percent_female = as.numeric(str_remove(cases_percent_female, "%")),
+  deaths_percent_male = as.numeric(str_remove(deaths_percent_male, "%")),
+  deaths_percent_female = as.numeric(str_remove(deaths_percent_female, "%"))) %>%
   # Make sure we have no duplicates (older versions had them, so just to be safe)
   distinct(iso3c, .keep_all = TRUE) %>%
   # Import population from UN WPP, see above
@@ -165,7 +171,9 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     iso3c == "SCO" ~ "..",
     iso3c == "NIR" ~ "..",
     TRUE ~ lending_cat
-  ))
+  )) %>%
+  rename(total_cases = cases_where_sex_disaggregated_data_is_available,
+         total_deaths = deaths_where_sex_disaggregated_data_is_available)
 
 
 ### ANALYSIS ####
