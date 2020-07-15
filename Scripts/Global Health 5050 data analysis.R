@@ -291,10 +291,10 @@ owid_working <- owid %>%
     bind_rows(owid_table_2 %>%
               # Keep just sub-total and "Neither" group
               filter(is.na(disaggregated_status) | disaggregated_status == "Sub-Total") %>%
-              # Use janitor function to create total line, specifying the name to avoid confusion with sub-total
-              janitor::adorn_totals(name = "Global Total") %>%
-              # Keep just total line
-              filter(disaggregated_status == "Global Total")) %>%
+                # Use summarize function to create total line 
+                summarize(across(countries:share_deaths, sum)) %>%
+                # Then add column to match column headers and name it Global Total
+                add_column(disaggregated_status = "Global Total", .before = "countries")) %>%
     # Rename "Neither" category to better label
     mutate(disaggregated_status = case_when(
       is.na(disaggregated_status) ~ "Countries w/o sex disaggregation",
