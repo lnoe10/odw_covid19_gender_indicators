@@ -9,7 +9,7 @@ month <- "Jun"
 day <- "25"
 
 # Import ODW master codes for merging and country groups
-odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master sheet.csv") %>%
+odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
   # Clean all variable names by converting to snake case
   janitor::clean_names() %>% 
   # Clear out extra lines at the bottom that just contain notes
@@ -18,7 +18,7 @@ odw_master_codes <- read_csv("Input/ODW Country and Region Codes 2020 master she
   distinct(iso_3_code, .keep_all = TRUE) %>%
   # Keep only relevant indicators and rename for clarity 
   select(iso3c = iso_3_code, country = country_name, odw_region_name, un_code = un_m49_code,
-         incgroup = world_bank_income_group_name, lending_cat = world_bank_lending_code_june_2019,
+         incgroup = world_bank_income_group_name, lending_cat = world_bank_lending_code_july_2020,
          wbregion = world_bank_all_income_region_names) %>%
   mutate(un_code = as.numeric(un_code), 
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
