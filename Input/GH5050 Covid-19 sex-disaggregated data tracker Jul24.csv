@@ -1,0 +1,163 @@
+Country Code,Country,Sex-disaggregated?,Date,Cases where sex-disaggregated data is available,Cases (% male),Cases (% female),Deaths where sex-disaggregated data is available,deaths (% male),deaths (% female),Proportion of deaths in confirmed cases (total),Proportion of deaths in confirmed cases (male),Proportion of deaths in confirmed cases (female),Proportion of deaths in confirmed cases (Male:female ratio),Source
+TH,Thailand,Yes,18.07.2020,"3,249",55.31,44.69,58,76,24,1.79,2.5,1,2.6,Source
+,Wales,Yes,19.07.2020,"16,847",37.38,62.62,"1,545",56.05,43.95,9.17,13.8,6.4,2.1,Source
+AL,Albania,Yes,19.07.2020,"4,171",47,53,113,64,36,2.71,3.7,1.8,2,Source
+NL,Netherlands,Yes,20.07.2020,"51,982",38.04,61.96,"6,136",54.99,45.01,11.8,17.1,8.6,2,Source
+JM,Jamaica,Yes,20.07.2020,809,43.76,56.24,10,60,40,1.24,1.7,0.9,1.9,Source
+BA,Bosnia and Herzegovina,Yes,20.07.2020,"4,892",50.25,49.75,109,64.22,35.78,2.23,2.9,1.6,1.8,Source
+DO,Dominican Republic,Yes,18.07.2020,"53,956",53.04,46.96,993,67.07,32.93,1.84,2.3,1.3,1.8,Source
+GR,Greece,Yes,19.07.2020,"3,744",54.49,45.51,195,67.69,32.31,5.21,6.5,3.7,1.8,Source
+KG,Kyrgyzstan,Yes,15.07.2020,"12,498",47.12,52.88,155,61.94,38.06,1.24,1.6,0.9,1.8,Source
+LV,Latvia,Yes,07.07.2020,"1,134",52.2,47.8,30,66.67,33.33,2.65,3.4,1.9,1.8,Source
+PE,Peru,Yes,19.07.2020,"357,681",56.8,43.2,"13,384",70.58,29.42,3.74,4.7,2.6,1.8,Source
+TR,Turkey,Yes,18.07.2020,"220,658",48,52,"5,491",62.23,37.77,2.49,3.2,1.8,1.8,Source
+BE,Belgium,Yes,19.07.2020,"63,923",37.68,62.32,"7,136",50.36,49.64,11.16,14.9,8.9,1.7,Source
+CN,China,Yes,28.02.2020,"55,924",51.1,48.9,"2,114",63.5,36.2,3.8,4.7,2.8,1.7,Source
+DK,Denmark,Yes,20.07.2020,"13,302",42.84,57.16,611,56.46,43.54,4.59,6.1,3.5,1.7,Source
+,England,Yes,13.07.2020,"247,011",43.24,56.76,"40,369",56.77,43.23,16.34,21.5,12.5,1.7,Source
+SZ,Eswatini,Yes,15.07.2020,"1,552",49.1,50.9,21,61.9,38.1,1.35,1.7,1,1.7,Source
+GT,Guatemala,Yes,18.07.2020,"37,803",61.79,38.21,"1,502",73.37,26.63,3.97,4.7,2.8,1.7,Source
+MK,North Macedonia,Yes,19.07.2020,"9,224",50.53,49.47,441,63.79,36.21,4.78,6,3.5,1.7,Source
+RO,Romania,Yes,18.07.2020,"36,691",45.3,54.7,"2,009",59,41,5.48,7.1,4.1,1.7,Source
+ES,Spain,Yes,21.05.2020,"248,335",43,57,"20,518",56.56,43.44,8.26,10.9,6.3,1.7,Source
+SE,Sweden,Yes,20.07.2020,"78,166",41.39,58.61,"5,646",54.68,45.32,7.22,9.5,5.6,1.7,Source
+BF,Burkina Faso,Yes,19.07.2020,"1,066",64.17,35.83,51,74.51,25.49,4.78,5.6,3.4,1.6,Source
+IT,Italy,Yes,13.07.2020,"243,297",45.91,54.09,"34,066",57.73,42.27,14,17.6,10.9,1.6,Source
+MX,Mexico,Yes,19.07.2020,"349,396",53.63,46.37,"41,324",65.24,34.76,11.83,14.4,8.9,1.6,Source
+MD,Moldova,Yes,19.07.2020,"21,115",41.12,58.88,697,52.37,47.63,3.3,4.2,2.7,1.6,Source
+,Northern Ireland,Yes,20.07.2020,"5,850",40.19,59.81,555,52.43,47.57,9.49,12.4,7.6,1.6,Source
+,Scotland,Yes,18.07.2020,"18,320",37.84,62.16,"4,193",49.73,50.27,22.89,30.1,18.5,1.6,Source
+CH,Switzerland,Yes,20.07.2020,"33,716",46.44,53.56,"1,691",57.54,42.46,5.02,6.2,4,1.6,Source
+UA,Ukraine,Yes,20.07.2020,"60,056",42.31,57.69,"1,516",53.23,46.77,2.52,3.2,2.1,1.6,Source
+PA,Panama,Yes,05.06.2020,"15,463",58.56,41.44,373,67.56,32.44,2.41,2.8,1.9,1.5,Source
+ZA,South Africa,Yes,01.07.2020,"158,234",42.84,57.16,"2,745",52.6,47.4,1.73,2.1,1.4,1.5,Source
+AF,Afghanistan,Yes,19.07.2020,"32,980",71.38,28.62,840,78.21,21.79,2.55,2.8,1.9,1.4,Source
+AR,Argentina,Yes,19.07.2020,"130,266",50.58,49.42,"2,350",58.38,41.62,1.8,2.1,1.5,1.4,Source
+BD,Bangladesh,Yes,19.07.2020,"207,453",71,29,"2,668",77,23,1.29,1.4,1,1.4,Source
+ID,Indonesia,Yes,19.07.2020,"89,869",52.2,47.8,"4,320",59.7,40.3,4.81,5.5,4.1,1.4,Source
+KR,South Korea,Yes,20.07.2020,"13,816",44.25,55.75,296,52.7,47.3,2.14,2.6,1.8,1.4,Source
+AU,Australia,Yes,21.07.2020,"12,690",51.3,48.7,128,57.03,42.97,1.01,1.1,0.9,1.3,Source
+AT,Austria,Yes,19.07.2020,"19,763",50,50,685,56,44,3.47,3.9,3.1,1.3,Source
+CO,Colombia,Yes,08.06.2020,"40,719",55.22,44.78,"1,308",61.24,38.76,3.21,3.6,2.8,1.3,Source
+DE,Germany,Yes,20.07.2020,"202,328",48.51,51.49,"9,085",55.3,44.7,4.49,5.1,3.9,1.3,Source
+HT,Haiti,Yes,18.07.2020,"7,100",59.1,40.9,151,65.56,34.44,2.13,2.4,1.8,1.3,Source
+PH,Philippines,Yes,19.07.2020,"68,898",56.38,43.62,"1,835",61.91,38.09,2.66,2.9,2.3,1.3,Source
+IE,Republic of Ireland,Yes,18.07.2020,"25,738",42.82,57.18,"1,753",49.29,50.71,6.81,7.8,6,1.3,Source
+US,USA,Yes,30.05.2020,"1,320,488",48.95,51.05,"71,116",54.52,45.48,5.39,6,4.8,1.3,Source
+CR,Costa Rica,Yes,19.07.2020,"11,534",56.13,43.87,66,60.61,39.39,0.57,0.6,0.5,1.2,Source
+CZ,Czech Republic,Yes,20.07.2020,"13,277",52.73,47.27,352,57.67,42.33,2.65,2.9,2.4,1.2,Source
+LU,Luxembourg,Yes,19.07.2020,"4,662",52,48,111,56,44,2.38,2.6,2.2,1.2,Source
+PT,Portugal,Yes,18.07.2020,"48,771",44.45,55.55,"1,691",49.79,50.21,3.47,3.9,3.1,1.2,Source
+CV,Cabo Verde,Yes,20.07.2020,"2,107",49.93,50.07,21,52.38,47.62,1,1.1,1,1.1,Source
+CA,Canada,Yes,20.07.2020,"109,825",44.35,55.65,"8,823",45.82,54.18,8.03,8.3,7.8,1.1,Source
+EE,Estonia,Yes,21.07.2020,"2,017",44.42,55.58,69,46.38,53.62,3.42,3.6,3.3,1.1,Source
+IR,Iran,Yes,17.03.2020,"14,991",57,43,853,59,41,5.69,5.9,5.4,1.1,Source
+NO,Norway,Yes,19.07.2020,"9,038",49.73,50.27,255,52.94,47.06,2.82,3,2.6,1.1,Source
+LR,Liberia,Yes,19.07.2020,"1,108",66.34,33.66,70,65.71,34.29,6.32,6.3,6.4,1,Source
+NP,Nepal,Yes,13.07.2020,"17,040",86,14,37,86.49,13.51,0.22,0.2,0.2,1,Source
+PK,Pakistan,Yes,20.07.2020,"266,096",73.98,26.02,"5,639",74.14,25.86,2.12,2.1,2.1,1,Source
+UG,Uganda,Yes,14.07.2020,"1,014",86.29,13.71,0,,,0,0,0,1,Source
+FI,Finland,Yes,19.07.2020,"7,351",49.63,50.37,326,47,53,4.43,4.2,4.7,0.9,Source
+SI,Slovenia,Yes,19.07.2020,"1,977",46.99,53.01,111,41.44,58.56,5.61,5,6.2,0.8,Source
+KE,Kenya,Yes,06.07.2020,"8,067",68,32,164,77,23,,2,2.3,0.5,Source
+MV,Maldives,Yes,18.07.2020,"2,953",80.22,19.78,15,66.67,33.33,0.3,0.3,0.5,0.5,Source
+BW,Botswana,Yes,16.07.2020,48,83.33,16.67,1,0,100,2.08,0,12.5,0,Source
+IL,Israel,Yes,07.07.2020,"30,354",54.27,45.73,330,54.24,45.76,,1.1,1.1,0,Source
+DZ,Algeria,Partial,19.07.2020,"23,691",53.88,46.12,,,,,,,,Source
+AM,Armenia,Partial,20.07.2020,,,,662,56.5,43.5,,,,,Source
+AZ,Azerbaijan,Partial,19.07.2020,"27,890",46,54,,,,,,,,Source
+BH,Bahrain,Partial,06.07.2020,"6,081",88.42,11.58,,,,,,,,Source
+BT,Bhutan,Partial,07.07.2020,80,50,50,,,,,,,,Source
+BR,Brazil,Partial,10.07.2020,,,,"66,822",60.07,39.93,,,,,Source
+BG,Bulgaria,Partial,25.05.2020,"2,443",49,51,,,,,,,,Source
+KH,Cambodia,Partial,12.07.2020,156,74.36,25.64,,,,,,,,Source
+CF,Central African Republic,Partial,18.07.2020,"4,548",73.33,26.67,,,,,,,,Source
+TD,Chad,Partial,17.07.2020,889,74.24,25.76,,,,,,,,Source
+CL,Chile,Partial,16.07.2020,"346,486",51.6,48.4,,,,,,,,Source
+HR,Croatia,Partial,18.07.2020,"4,344",48.64,51.36,,,,,,,,Source
+CU,Cuba,Partial,20.07.2020,"2,449",51.2,48.8,,,,,,,,Source
+CY,Cyprus,Partial,20.07.2020,"1,038",51.2,48.8,,,,,,,,Source
+DJ,Djibouti,Partial,,"3,779",68,32,,,,,,,,Source
+EC,Ecuador,Partial,19.07.2020,"74,620",54.2,45.8,,,,,,,,Source
+SV,El Salvador,Partial,19.07.2020,"12,582",57.61,42.39,,,,,,,,Source
+ET,Ethiopia,Partial,28.06.2020,"5,846",61.2,38.8,,,,,,,,Source
+FR,France,Partial,11.07.2020,,,,"19,465",58.89,41.11,,,,,Source
+GM,Gambia,Partial,14.07.2020,78,65.38,34.62,,,,,,,,Source
+GH,Ghana,Partial,24.07.2020,"30,366",59,41,,,,,,,,Source
+GN,Guinea,Partial,18.07.2020,"6,590",67.8,32.2,,,,,,,,Source
+HN,Honduras,Partial,19.07.2020,"33,827",53.88,46.12,,,,,,,,Source
+HK,Hong Kong,Partial,20.07.2020,"2,019",51.21,48.79,,,,,,,,Source
+HU,Hungary,Partial,20.07.2020,,,,597,48.91,51.09,,,,,Source
+IS,Iceland,Partial,21.06.2020,"1,823",49.75,50.25,,,,,,,,Source
+IN,India,Partial,20.07.2020,"1,167,550",64.93,35.07,,,,,,,,Source
+JP,Japan,Partial,21.06.2020,"17,301",55.07,44.93,,,,,,,,Source
+KZ,Kazakhstan,Partial,08.06.2020,"9,452",61.03,38.97,,,,,,,,Source
+LB,Lebanon,Partial,20.07.2020,"2,977",60,40,,,,,,,,Source
+LT,Lithuania,Partial,21.07.2020,"1,951",43,57,,,,,,,,Source
+MY,Malaysia,Partial,21.06.2020,,,,121,76.03,23.97,,,,,Source
+ML,Mali,Partial,01.07.2020,"2,162",68.04,31.96,,,,,,,,Source
+MT,Malta,Partial,21.07.2020,674,60.24,39.76,,,,,,,,Source
+MN,Mongolia,Partial,21.07.2020,287,70.38,29.62,,,,,,,,Source
+MA,Morocco,Partial,17.07.2020,"17,015",53,47,,,,,,,,Source
+MZ,Mozambique,Partial,19.07.2020,"1,506",64.41,35.59,,,,,,,,Source
+NZ,New Zealand,Partial,19.07.2020,"1,555",44.76,55.24,,,,,,,,Source
+NG,Nigeria,Partial,15.07.2020,"34,854",65,35,,,,,,,,Source
+PY,Paraguay,Partial,19.07.2020,"3,748",66.73,33.27,,,,,,,,Source
+PL,Poland,Partial,21.07.2020,,,,"1,643",52.04,47.96,,,,,Source
+QA,Qatar,Partial,28.04.2020,"12,156",91,9,,,,,,,,Source
+RW,Rwanda,Partial,,"1,473",79.63,20.37,,,,,,,,Source
+SA,Saudi Arabia,Partial,26.05.2020,"76,726",75,25,,,,,,,,Source
+SN,Senegal,Partial,,736,52.17,47.83,,,,,,,,Source
+RS,Serbia,Partial,06.05.2020,,,,193,61.7,38.3,,,,,Source
+SL,Sierra Leone,Partial,15.07.2020,"1,678",51.55,48.45,,,,,,,,Source
+SG,Singapore,Partial,20.07.2020,"6,530",88.93,11.07,,,,,,,,Source
+SK,Slovakia,Partial,28.05.2020,"1,491",50,50,,,,,,,,Source
+SO,Somalia,Partial,20.07.2020,"3,130",73,27,,,,,,,,Source
+TW,Taiwan,Partial,21.04.2020,418,48.8,51.2,,,,,,,,Source
+TN,Tunisia,Partial,08.07.2020,"1,231",52,48,,,,,,,,Source
+VE,Venezuela,Partial,19.07.2020,"12,334",58.2,41.8,,,,,,,,Source
+VN,Vietnam,Partial,21.07.2020,369,52.85,47.15,,,,,,,,Source
+YE,Yemen,Partial,20.07.2020,"1,897",26.83,73.17,,,,,,,,Source
+AD,Andorra,No,,,,,,,,,,,,Source
+AO,Angola,No,,,,,,,,,,,,Source
+BY,Belarus,No,,,,,,,,,,,,Source
+BJ,Benin,No,,,,,,,,,,,,Source
+BO,Bolivia,No,,,,,,,,,,,,Source
+CM,Cameroon,No,,,,,,,,,,,,Source
+CG,Congo,No,,,,,,,,,,,,Source
+CI,Cote D'Ivoire,No,,,,,,,,,,,,Source
+CD,DRC,No,,,,,,,,,,,,Source
+EG,Egypt,No,,,,,,,,,,,,Source
+GQ,Equatorial Guinea,No,,,,,,,,,,,,Source
+GA,Gabon,No,,,,,,,,,,,,Source
+GE,Georgia,No,,,,,,,,,,,,Source
+GW,Guinea-Bissau,No,,,,,,,,,,,,Source
+GY,Guyana,No,,,,,,,,,,,,Source
+IQ,Iraq,No,,,,,,,,,,,,Source
+JO,Jordan,No,,,,,,,,,,,,Source
+KW,Kuwait,No,,,,,,,,,,,,Source
+LS,Lesotho,No,,,,,,,,,,,,Source
+LY,Libya,No,,,,,,,,,,,,Source
+MG,Madagascar,No,,,,,,,,,,,,Source
+MW,Malawi,No,,,,,,,,,,,,Source
+MR,Mauritania,No,,,,,,,,,,,,Source
+NA,Namibia,No,,,,,,,,,,,,Source
+NI,Nicaragua,No,,,,,,,,,,,,Source
+NE,Niger,No,,,,,,,,,,,,Source
+OM,Oman,No,,,,,,,,,,,,Source
+PS,Palestine,No,,,,,,,,,,,,Source
+PG,Papua New Guinea,No,,,,,,,,,,,,Source
+RU,Russia,No,,,,,,,,,,,,Source
+SM,San Marino,No,,,,,,,,,,,,Source
+SS,South Sudan,No,,,,,,,,,,,,Source
+LK,Sri Lanka,No,,,,,,,,,,,,Source
+SD,Sudan,No,,,,,,,,,,,,Source
+SR,Suriname,No,,,,,,,,,,,,Source
+SY,Syria,No,,,,,,,,,,,,Source
+TJ,Tajikistan,No,,,,,,,,,,,,Source
+TG,Togo,No,,,,,,,,,,,,Source
+AE,UAE,No,,,,,,,,,,,,Source
+UY,Uruguay,No,,,,,,,,,,,,Source
+UZ,Uzbekistan,No,,,,,,,,,,,,Source
+ZM,Zambia,No,,,,,,,,,,,,Source
+ZW,Zimbabwe,No,,,,,,,,,,,,Source
