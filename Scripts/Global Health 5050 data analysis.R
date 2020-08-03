@@ -6,7 +6,7 @@ library(tidyverse)
 # Set date variables to toggle between versions of data to import.
 # Using 3 letter month, 2 digit day format
 month <- "Jul"
-day <- "09"
+day <- "24"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -28,7 +28,7 @@ covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregate
   janitor::clean_names() 
 
 # Import Our World In Data Coronavirus data and clean, keeping latest value
-owid <- read_csv(str_c("Input/owid-covid-data_", month, day, ".csv")) %>%
+owid <- read_csv(str_c("Input/owid-covid-data_", month, day, ".csv"), guess_max = 10000) %>%
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
   # replace iso3 value for Kosovo with version that World Bank uses for merging.
   mutate(iso3c = case_when(
@@ -46,7 +46,7 @@ owid <- read_csv(str_c("Input/owid-covid-data_", month, day, ".csv")) %>%
 
 # Import countries that have sex AND age disaggregation for cases and deaths
 # Also from Global Health 5050
-covid_age_sex <- read_csv("Input/gh_sex_age_Jun04.csv") %>%
+covid_age_sex <- read_csv("Input/gh_sex_age_Jul24.csv") %>%
   filter(country != "Scotland") %>%
   mutate(
     country = case_when(
