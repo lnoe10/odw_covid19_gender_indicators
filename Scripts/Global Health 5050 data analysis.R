@@ -29,14 +29,15 @@ covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregate
 
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
 # appending latest date if Gh5050 date isn't available.
-# Read in latest data from Our World in Data Github
-owid <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 10000) %>% 
+# Read in latest data from Our World in Data Github raw
+owid_raw <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 10000)
+owid <- owid_raw %>% 
   # Keep observations for latest Gh5050 update to line up
   filter(date == str_c("2020-", month, "-", day)) %>% 
   # In cases where Gh5050 date is not available (some countries take
   # longer to report, or stopped reporting), append latest date
   # of all countries by importing data again
-  bind_rows(read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 10000) %>% 
+  bind_rows(owid_raw %>% 
               group_by(iso_code) %>% 
               mutate(obs_num = row_number()) %>% 
               filter(obs_num == max(obs_num, na.rm = TRUE)) %>% 
