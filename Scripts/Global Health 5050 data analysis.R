@@ -36,16 +36,16 @@ owid <- owid_raw %>%
   filter(date == str_c("2020-", month, "-", day)) %>% 
   # In cases where Gh5050 date is not available (some countries take
   # longer to report, or stopped reporting), append latest date
-  # of all countries by importing data again
+  # of all countries
   bind_rows(owid_raw %>% 
               group_by(iso_code) %>% 
               mutate(obs_num = row_number()) %>% 
               filter(obs_num == max(obs_num, na.rm = TRUE)) %>% 
               ungroup() %>%
               select(-obs_num)) %>% 
-  # Then keep first observation by iso3 code and country.
-  # Will keep Gh5050 update day for countries that have it and
-  # will keep latest update for countries that don't
+  # Then keep distinct (in this case first) observation by iso3 code 
+  # and country name. Will keep Gh5050 update day for countries that 
+  # have it and will keep latest update for countries that don't
   # As of August 8, 212 location available, that should be number of obs
   # in dataset
   distinct(iso_code, location, .keep_all = TRUE) %>%
