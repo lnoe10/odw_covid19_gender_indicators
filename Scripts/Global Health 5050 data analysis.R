@@ -27,8 +27,28 @@ odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
 covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day,".csv")) %>%
   janitor::clean_names() 
 
-# Import Our World In Data Coronavirus data and clean, keeping latest value
-owid <- read_csv(str_c("Input/owid-covid-data_", month, day, ".csv"), guess_max = 10000) %>%
+# Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
+# appending latest date if Gh5050 date isn't available.
+# Read in latest data from Our World in Data Github
+owid <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 10000) %>% 
+  # Keep observations for latest Gh5050 update to line up
+  filter(date == str_c("2020-", month, "-", day)) %>% 
+  # In cases where Gh5050 date is not available (some countries take
+  # longer to report, or stopped reporting), append latest date
+  # of all countries by importing data again
+  bind_rows(read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 10000) %>% 
+              group_by(iso_code) %>% 
+              mutate(obs_num = row_number()) %>% 
+              filter(obs_num == max(obs_num, na.rm = TRUE)) %>% 
+              ungroup() %>%
+              select(-obs_num)) %>% 
+  # Then keep first observation by iso3 code and country.
+  # Will keep Gh5050 update day for countries that have it and
+  # will keep latest update for countries that don't
+  # As of August 8, 212 location available, that should be number of obs
+  # in dataset
+  distinct(iso_code, location, .keep_all = TRUE) %>%
+  # Keep only variables we want
   select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
   # replace iso3 value for Kosovo with version that World Bank uses for merging.
   mutate(iso3c = case_when(
@@ -36,13 +56,7 @@ owid <- read_csv(str_c("Input/owid-covid-data_", month, day, ".csv"), guess_max 
     TRUE ~ iso3c
   )) %>%
   # Add country grouping info
-  left_join(odw_master_codes, by = c("iso3c")) %>%
-  # By country, keep only latest value. 
-  # Assumes data is sorted from earliest to latest datapoint, check!
-  group_by(iso3c) %>%
-  mutate(obs_num = row_number()) %>%
-  filter(obs_num == max(obs_num, na.rm = TRUE)) %>%
-  ungroup()
+  left_join(odw_master_codes, by = c("iso3c"))
 
 # Import countries that have sex AND age disaggregation for cases and deaths
 # Also from Global Health 5050
