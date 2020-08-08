@@ -6,7 +6,7 @@ library(tidyverse)
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
 month <- "08"
-day <- "08"
+day <- "07"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -24,7 +24,7 @@ odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
 
 # Import Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
-covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day,".csv")) %>%
+covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day,".csv"), na = "") %>%
   janitor::clean_names() 
 
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
@@ -128,6 +128,8 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     country == "Wales" ~ "WAL",
     country == "Scotland" ~ "SCO",
     country == "Northern Ireland" ~ "NIR",
+    # Fix Bosnia wrong iso2 code
+    str_detect(country, "Bosnia") ~ "BIH",
     TRUE ~ iso3c
   ),
   year = as.numeric(str_extract(date, "[0-9]{4}$")),
