@@ -133,9 +133,30 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     str_detect(country, "Bosnia") ~ "BIH",
     TRUE ~ iso3c
   ),
+  # Change Bulgaria date to old date
+  date = case_when(
+    country_code == "BG" ~ "25.05.2020",
+    TRUE ~ date
+  ),
   year = as.numeric(str_extract(date, "[0-9]{4}$")),
   month = as.numeric(str_extract(date, "(?<=\\.)[0-9]{2}(?=\\.)")),
   day = as.numeric(str_extract(date, "^[0-9]{2}(?=\\.)")),
+  # In the absence of feedback from GH5050 as of 12 August, use old info
+  # for Bulgaria, which is currently listed as Partial,
+  # but with no further info. As of July 24 update, BG was partial for cases,
+  # Replace with that info
+  cases_where_sex_disaggregated_data_is_available = case_when(
+    country_code == "BG" ~ 2443,
+    TRUE ~ cases_where_sex_disaggregated_data_is_available
+  ),
+  cases_percent_male = case_when(
+    country_code == "BG" ~ 49,
+    TRUE ~ cases_percent_male
+  ),
+  cases_percent_female = case_when(
+    country_code == "BG" ~ 51,
+    TRUE ~ cases_percent_female
+  ),
   # Add source name
   source_name = "Global Health 50/50",
   # Recode sex-disaggregated variable to reflect differences in status
