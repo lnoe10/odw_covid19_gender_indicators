@@ -165,7 +165,7 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     sex_disaggregated == "Partial" & !is.na(cases_percent_male) ~ "Cases only",
     sex_disaggregated == "Partial" & !is.na(deaths_percent_male) ~ "Deaths only",
     TRUE ~ "None"
-  ),
+  )) %>%
   # Make sure we have no duplicates (older versions had them, so just to be safe)
   distinct(iso3c, .keep_all = TRUE) %>%
   # Import population from UN WPP, see above
