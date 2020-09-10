@@ -141,9 +141,9 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     TRUE ~ "None"
   ),
   cases_percent_male = as.numeric(str_remove(cases_percent_male, "%")),
-  cases_percent_female = as.numeric(str_remove(cases_percent_male, "%")),
+  cases_percent_female = as.numeric(str_remove(cases_percent_female, "%")),
   deaths_percent_male = as.numeric(str_remove(deaths_percent_male, "%")),
-  deaths_percent_female = as.numeric(str_remove(deaths_percent_male, "%"))) %>%
+  deaths_percent_female = as.numeric(str_remove(deaths_percent_female, "%"))) %>%
   # Make sure we have no duplicates (older versions had them, so just to be safe)
   distinct(iso3c, .keep_all = TRUE) %>%
   # Import population from UN WPP, see above
