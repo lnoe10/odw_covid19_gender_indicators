@@ -5,8 +5,8 @@ library(tidyverse)
 
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
-month <- "08"
-day <- "07"
+month <- "09"
+day <- "08"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -129,43 +129,21 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     country == "Wales" ~ "WAL",
     country == "Scotland" ~ "SCO",
     country == "Northern Ireland" ~ "NIR",
-    # Fix Bosnia wrong iso2 code
-    str_detect(country, "Bosnia") ~ "BIH",
     TRUE ~ iso3c
-  ),
-  # Change Bulgaria date to old date
-  date = case_when(
-    country_code == "BG" ~ "25.05.2020",
-    TRUE ~ date
-  ),
-  year = as.numeric(str_extract(date, "[0-9]{4}$")),
-  month = as.numeric(str_extract(date, "(?<=\\.)[0-9]{2}(?=\\.)")),
-  day = as.numeric(str_extract(date, "^[0-9]{2}(?=\\.)")),
-  # In the absence of feedback from GH5050 as of 12 August, use old info
-  # for Bulgaria, which is currently listed as Partial,
-  # but with no further info. As of July 24 update, BG was partial for cases,
-  # Replace with that info
-  cases_where_sex_disaggregated_data_is_available = case_when(
-    country_code == "BG" ~ 2443,
-    TRUE ~ cases_where_sex_disaggregated_data_is_available
-  ),
-  cases_percent_male = case_when(
-    country_code == "BG" ~ 49,
-    TRUE ~ cases_percent_male
-  ),
-  cases_percent_female = case_when(
-    country_code == "BG" ~ 51,
-    TRUE ~ cases_percent_female
   ),
   # Add source name
   source_name = "Global Health 50/50",
   # Recode sex-disaggregated variable to reflect differences in status
   disaggregated_status = case_when(
-    sex_disaggregated == "Yes" ~ "Both",
-    sex_disaggregated == "Partial" & !is.na(cases_percent_male) ~ "Cases only",
-    sex_disaggregated == "Partial" & !is.na(deaths_percent_male) ~ "Deaths only",
+    case_death_data_by_sex == "Yes" ~ "Both",
+    case_death_data_by_sex == "Partial" & !is.na(cases_percent_male) ~ "Cases only",
+    case_death_data_by_sex == "Partial" & !is.na(deaths_percent_male) ~ "Deaths only",
     TRUE ~ "None"
-  )) %>%
+  ),
+  cases_percent_male = as.numeric(str_remove(cases_percent_male, "%")),
+  cases_percent_female = as.numeric(str_remove(cases_percent_male, "%")),
+  deaths_percent_male = as.numeric(str_remove(deaths_percent_male, "%")),
+  deaths_percent_female = as.numeric(str_remove(deaths_percent_male, "%"))) %>%
   # Make sure we have no duplicates (older versions had them, so just to be safe)
   distinct(iso3c, .keep_all = TRUE) %>%
   # Import population from UN WPP, see above
