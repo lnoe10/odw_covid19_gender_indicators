@@ -172,7 +172,7 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     iso3c == "WAL" ~ "Europe & Central Asia",
     iso3c == "SCO" ~ "Europe & Central Asia",
     iso3c == "NIR" ~ "Europe & Central Asia",
-    TRUE ~ incgroup
+    TRUE ~ wbregion
   ),
   odw_region_name = case_when(
     iso3c == "ENG" ~ "Northern Europe",
