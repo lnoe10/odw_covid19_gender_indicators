@@ -133,21 +133,26 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
   ),
   # Add source name
   source_name = "Global Health 50/50",
-  # Recode sex-disaggregated variable to reflect differences in status
+  # Clean date columns to enable comparison of dates
+  cases_date = lubridate::dmy(cases_date),
+  deaths_date = lubridate::dmy(deaths_date),
+  # Create own sex-disaggregated status variable to reflect differences in reporting cases and deaths
+  # New Gh5050 makes Both equal "country has ever reported data on both cases and deaths at the same time point."
+  # For our purposes, not important for the moment, so go with whether
+  # Sex-disaggregated data is available for both cases and deaths manually.
+  # Use cases_date and deaths_date for this, since if cases or deaths are 0,
+  # even though they're disaggregated, the columns for percent_male will be NA, rather than 0.
   disaggregated_status = case_when(
-    case_death_data_by_sex == "Yes" ~ "Both",
-    case_death_data_by_sex == "Partial" & !is.na(cases_percent_male) ~ "Cases only",
-    case_death_data_by_sex == "Partial" & !is.na(deaths_percent_male) ~ "Deaths only",
+    !is.na(cases_date) & !is.na(deaths_date) ~ "Both",
+    !is.na(cases_date) & is.na(deaths_date) ~ "Cases only",
+    is.na(cases_date) & !is.na(deaths_date) ~ "Deaths only",
     TRUE ~ "None"
   ),
   # Clean rates of cases and deaths
   cases_percent_male = as.numeric(str_remove(cases_percent_male, "%")),
   cases_percent_female = as.numeric(str_remove(cases_percent_female, "%")),
   deaths_percent_male = as.numeric(str_remove(deaths_percent_male, "%")),
-  deaths_percent_female = as.numeric(str_remove(deaths_percent_female, "%")),
-  # Clean date columns to enable comparison of dates
-  cases_date = lubridate::dmy(cases_date),
-  deaths_date = lubridate::dmy(deaths_date)) %>%
+  deaths_percent_female = as.numeric(str_remove(deaths_percent_female, "%"))) %>%
   # Make sure we have no duplicates (older versions had them, so just to be safe)
   distinct(iso3c, .keep_all = TRUE) %>%
   # Import population from UN WPP, see above
