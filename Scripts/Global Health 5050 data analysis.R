@@ -5,8 +5,8 @@ library(tidyverse)
 
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
-month <- "09"
-day <- "08"
+month <- "10"
+day <- "06"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -140,10 +140,14 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     case_death_data_by_sex == "Partial" & !is.na(deaths_percent_male) ~ "Deaths only",
     TRUE ~ "None"
   ),
+  # Clean rates of cases and deaths
   cases_percent_male = as.numeric(str_remove(cases_percent_male, "%")),
   cases_percent_female = as.numeric(str_remove(cases_percent_female, "%")),
   deaths_percent_male = as.numeric(str_remove(deaths_percent_male, "%")),
-  deaths_percent_female = as.numeric(str_remove(deaths_percent_female, "%"))) %>%
+  deaths_percent_female = as.numeric(str_remove(deaths_percent_female, "%")),
+  # Clean date columns to enable comparison of dates
+  cases_date = lubridate::dmy(cases_date),
+  deaths_date = lubridate::dmy(deaths_date)) %>%
   # Make sure we have no duplicates (older versions had them, so just to be safe)
   distinct(iso3c, .keep_all = TRUE) %>%
   # Import population from UN WPP, see above
