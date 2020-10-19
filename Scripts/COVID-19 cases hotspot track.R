@@ -1,7 +1,6 @@
 library(tidyverse)
-setwd("C:/Users/lnoe/Documents/R")
 
-odw_master_codes <- read_csv("Data/Input Data/2021 ODW Country and Region Codes.csv") %>%
+odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
   # Clean all variable names by converting to snake case
   janitor::clean_names() %>% 
   # Clear out extra lines at the bottom that just contain notes
@@ -114,7 +113,7 @@ owid_test %>%
        title = "Cluster 3 countries") +
   theme(axis.text.x = element_text(angle = 90), legend.position = "none")
 
-ggsave("Graphs/Cluster 3 countries.png", dpi = 600)
+ggsave("Output/Cluster 3 countries.png", dpi = 600)
 
 owid_test %>% 
   filter(iso3c %in% c("UGA", "AGO", "ETH", "MOZ", "BGD")) %>% 
@@ -128,7 +127,7 @@ owid_test %>%
        title = "Cluster 2 countries") +
   theme(axis.text.x = element_text(angle = 90), legend.position = "none")
 
-ggsave("Graphs/Cluster 2 countries.png", dpi = 600)
+ggsave("Output/Cluster 2 countries.png", dpi = 600)
 
 # All low and lower middle income countries
 owid_test %>% 
@@ -142,7 +141,7 @@ owid_test %>%
   labs(x = "", y = "Rolling average of new cases over two months") +
   theme(axis.text.x = element_text(angle = 90), legend.position = "none")
 
-ggsave("Graphs/Low and lower middle cases Sep14.png", dpi = 400)
+ggsave("Output/Low and lower middle cases Sep14.png", dpi = 400)
 
 owid_test %>%
   filter(date != "2019-12-31") %>%
@@ -285,7 +284,7 @@ model_fitted_loess_daily %>%
   theme(axis.text.x = element_text(angle = 90)) +
   scale_colour_manual(name = "", 
                       values =c('black'='black','blue'='blue', 'orange' = 'orange'), labels = c("New cases\nper million", "LOESS\nsmoothed", "Last 2\nmo avg."))
-ggsave("Graphs/Sao Tome and Principe trend peaks and troughs.png", dpi = 500)  
+ggsave("Output/Sao Tome and Principe trend peaks and troughs.png", dpi = 500)  
 
 # Replicates loess in geom_smooth perfectly.
 owid %>%
@@ -306,7 +305,7 @@ owid %>%
   labs(x = "", y = "New daily cases per million",
        title = "Bangladesh") +
   theme(axis.text.x = element_text(angle = 90), legend.title = element_blank())
-ggsave("Graphs/BGD smoothed per million.png", dpi = 600)
+ggsave("Output/BGD smoothed per million.png", dpi = 600)
 
 
 
@@ -358,7 +357,7 @@ owid_test %>%
                        labels = c("61 day average", "31 day average", "Daily cases/million"),
                        guide = "legend")
 
-ggsave("Graphs/Gambia example.png", dpi = 600)
+ggsave("Output/Gambia example.png", dpi = 600)
 
 # How to do this with Exponential growth?
 # Seems to have to do with NLS
