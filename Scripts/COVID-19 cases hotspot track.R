@@ -59,6 +59,7 @@ owid <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/pu
   # Sort again just in case
   arrange(iso3c, date)
 
+### Analysis of Local Maxima 1 ####
 # One way of finding local maxima
 # Find local maxima
 owid_maxima <- owid %>%
@@ -96,23 +97,26 @@ owid_maxima <- owid %>%
   )) %>%
   ungroup()
 
-# Chart of trends
-owid_test %>% 
+# Chart of trends of 61 day averages with local maxima flagged
+owid_maxima %>% 
   filter(iso3c %in% c("BGD", "SWZ", "GMB", "CPV", "UKR")) %>% 
   ggplot(aes(x = date, y = avg_new_61_day_pm, color = country)) + 
   geom_line() + 
-  geom_point(data = owid_test %>% 
+  geom_point(data = owid_maxima %>% 
                filter(iso3c %in% c("BGD", "SWZ", "GMB", "CPV", "UKR"), local_max_cases == TRUE)) + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b %d") +
   labs(x = "", y = "Rolling average of new cases over two months") +
   theme(axis.text.x = element_text(angle = 90))
 
-last_point <- owid_test %>%
+# Create last point dataframe to extract country label
+last_point <- owid_maxima %>%
   group_by(iso3c) %>%
   slice(which.max(date)) %>%
   ungroup()
 
-owid_test %>% 
+# Chart of trends of 61 day averages with country label on last point
+# For, at the time, cluster 3 countries
+owid_maxima %>% 
   filter(iso3c %in% c("CPV", "SWZ", "STP", "UKR", "GMB")) %>% 
   ggplot(aes(x = date, y = avg_new_61_day_pm, color = country)) + 
   geom_line() + 
@@ -126,7 +130,9 @@ owid_test %>%
 
 ggsave("Output/Cluster 3 countries.png", dpi = 600)
 
-owid_test %>% 
+# Chart of trends of 61 day averages with country label on last point
+# For, at the time, cluster 2 countries
+owid_maxima %>% 
   filter(iso3c %in% c("UGA", "AGO", "ETH", "MOZ", "BGD")) %>% 
   ggplot(aes(x = date, y = avg_new_61_day_pm, color = country)) + 
   geom_line() + 
@@ -141,11 +147,12 @@ owid_test %>%
 ggsave("Output/Cluster 2 countries.png", dpi = 600)
 
 # All low and lower middle income countries
-owid_test %>% 
+# Chart of trends of 61 day averages with country label on last point
+owid_maxima %>% 
   filter(incgroup %in% c("Low income", "Lower middle income")) %>% 
   ggplot(aes(x = date, y = avg_new_61_day_pm, color = iso3c)) + 
   geom_line() + 
-  geom_point(data = owid_test %>% 
+  geom_point(data = owid_maxima %>% 
                filter(incgroup %in% c("Low income", "Lower middle income"), local_max_cases == TRUE)) + 
   scale_x_date(date_breaks = "2 weeks", date_labels = "%b %d",
                limits = c(Sys.Date() - 252, Sys.Date())) +
@@ -154,13 +161,14 @@ owid_test %>%
 
 ggsave("Output/Low and lower middle cases Sep14.png", dpi = 400)
 
-owid_test %>%
-  filter(date != "2019-12-31") %>%
-  write_csv("Data/Output Data/owid_case_deaths_ma.csv", na = "")
+# Write time series to CSV
+# owid_maxima %>%
+#   filter(date != "2019-12-31") %>%
+#   write_csv("Output/owid_case_deaths_ma.csv", na = "")
 
-owid %>%
-  write_csv("Data/Output Data/owid_case_avg.csv", na = "")
 
+### Calculate time trends ####
+### Linear ####
 owid_trend <- owid %>%
   # Drop NA average new cases. Breaks model otherwise.
   # This should only drop HK, where no info is available
@@ -173,27 +181,8 @@ owid_trend <- owid %>%
   # filter(date >= max(date, na.rm = TRUE) - 27 & date <= max(date, na.rm = TRUE))
 
 
-library(broom)
-
-test <- owid %>%
-  select(country, iso3c, avg_new_7_day_pm, date) %>%
-  mutate(new_date = as.numeric(date)) %>%
-  # filter(!is.na(avg_new_61_day_pm)) %>%
-  nest(-c(country, iso3c)) %>%
-  mutate(fit = map(data, ~ loess(avg_new_7_day_pm ~ new_date, .))) %>%
-  unnest(purr::map2(fit, data, augment))
-
-models <- owid %>%
-  tidyr::nest(-c(country, iso3c)) %>%
-  mutate(
-    # Perform loess calculation on each CpG group
-    m = purrr::map(data, loess,
-                   formula = avg_new_7_day_pm ~ as.numeric(date)),
-    # Retrieve the fitted values from each model
-    fitted = purrr::map(m, `[[`, "fitted")
-  )
-
-# Run linear model
+# Run linear model to retrieve coefficients over entire time horizon
+# For 61 day average of cases
 model_coeffs_lm_61 <- do(owid_trend,
    broom::tidy(
      lm(avg_new_61_day_pm ~ date, data = .)
@@ -201,6 +190,7 @@ model_coeffs_lm_61 <- do(owid_trend,
   filter(term == "date") %>%
   ungroup()
 
+# For 31 day average of cases
 model_coeffs_lm_31 <- do(owid_trend,
                          broom::tidy(
                            lm(avg_new_31_day_pm ~ date, data = .)
@@ -208,25 +198,33 @@ model_coeffs_lm_31 <- do(owid_trend,
   filter(term == "date") %>%
   ungroup()
 
-# Fitted values
+# Run linear model to retrieve fitted values over entire time horizon
+# For 61 day average of cases
 model_fitted_lm_61 <- do(owid_trend,
                            broom::augment(
                              lm(avg_new_61_day_pm ~ date, data = .)
                            )) %>%
     ungroup()
 
+# For 31 day average of cases
 model_fitted_lm_31 <- do(owid_trend,
                          broom::augment(
                            lm(avg_new_31_day_pm ~ date, data = .)
                          )) %>%
   ungroup() 
 
+### LOESS smooth ####
+# Smoothing new cases as in 
+# COVID-19 in the United States: Trajectories and second surge behavior
+# Published in Chaos in August 2020
+# They LOESS smooth and then turn values less than 0 into 0
 # Prep dataset for LOESS smoothing. Using 7 day rolling average
 owid_na <- owid %>% 
   filter(!is.na(avg_new_7_day_pm)) %>% 
   mutate(date = as.numeric(date)) %>%
   group_by(country, iso3c)
-# Predicting new values (.fitted) per day per country, setting 
+
+# Predicting new values (.fitted) per day per country
 model_fitted_loess_7 <- do(owid_na,
                          broom::augment(
                            loess(avg_new_7_day_pm ~ date, data = ., na.action = "na.omit", span = 0.5)
@@ -234,39 +232,51 @@ model_fitted_loess_7 <- do(owid_na,
   ungroup() %>%
   mutate(date = as.Date(date, origin = "1970-01-01"))
 
+# Using daily new cases per million
 owid_daily_na <- owid %>% 
   filter(!is.na(new_cases_per_million)) %>% 
   mutate(date = as.numeric(date)) %>%
   group_by(country, iso3c)
+
+# Predicting new values (.fitted) per day per country
 model_fitted_loess_daily <- do(owid_daily_na,
                            broom::augment(
                              loess(new_cases_per_million ~ date, data = ., na.action = "na.omit", span = 0.25)
                            )) %>%
   ungroup() %>%
+  # To mirror paper, clean fitted values by turning values less than 0 into 0
+  # Turn date back into date format
   mutate(date = as.Date(date, origin = "1970-01-01"),
          .fitted = case_when(
            .fitted <0 ~ 0,
            TRUE ~ .fitted
          )) %>%
+  # Calculate maximum and minimum values 17 days ahead and behind (14 day incubation period and lag of reporting on weekend)
+  # As used in Chaos paper
   group_by(iso3c) %>% 
   arrange(iso3c, date) %>%
   mutate(rolling_max_back = RcppRoll::roll_max(lag(.fitted), 17, fill = NA, align = "right"),
          rolling_max_forward = RcppRoll::roll_max(lead(.fitted), 17, fill = NA, align = "left"),
          rolling_min_back = RcppRoll::roll_min(lag(.fitted), 17, fill = NA, align = "right"),
          rolling_min_forward = RcppRoll::roll_min(lead(.fitted), 17, fill = NA, align = "left")) %>%
+  # Carry forward max and min calculations when beginning and end values 
+  # Are within 17 days
   fill(ends_with("back"), .direction = "up") %>%
   fill(ends_with("forward"), .direction = "down") %>%
   ungroup() %>%
+  # Calculate peak if a fitted value is greater than both the max behind and ahead
   mutate(peak = case_when(
     .fitted > rolling_max_back & .fitted > rolling_max_forward ~ .fitted,
     .fitted > rolling_max_back & date == max(date, na.rm = TRUE) ~ .fitted,
     TRUE ~ NA_real_
   ),
+  # Calculate trough if a fitted value is less than both the min behind and ahead
   trough = case_when(
     .fitted < rolling_min_back & .fitted < rolling_min_forward ~ .fitted,
     TRUE ~ NA_real_
   ))
 
+# Add column that calculates last two months average of smoothed new cases
 model_fitted_loess_daily <- model_fitted_loess_daily %>%
   left_join(model_fitted_loess_daily %>%
               filter(date >= max(date, na.rm = TRUE) - 61) %>%
@@ -281,7 +291,8 @@ model_fitted_loess_daily %>%
          peak, trough, `Average new cases per million over last 2 months` = last_two_avg) %>%
   write_csv("Data/Output Data/New cases smoothed.csv", na = "")
 
-# Master graph for daily cases
+# Master graph for daily cases, smoothed new cases, peaks, troughs and
+# Last two months average
 model_fitted_loess_daily %>%
   filter(iso3c == "AFG") %>%
   ggplot(aes(x = date)) + 
@@ -297,7 +308,8 @@ model_fitted_loess_daily %>%
                       values =c('black'='black','blue'='blue', 'orange' = 'orange'), labels = c("New cases\nper million", "LOESS\nsmoothed", "Last 2\nmo avg."))
 ggsave("Output/Sao Tome and Principe trend peaks and troughs.png", dpi = 500)  
 
-# Replicates loess in geom_smooth perfectly.
+# As a robustness check, our LOESS calculations
+# replicate loess in geom_smooth perfectly.
 owid %>%
   left_join(model_fitted_loess_7 %>% select(iso3c, date, pred_loess7 = .fitted)) %>%
   filter(iso3c == "BGD") %>%
@@ -306,21 +318,11 @@ owid %>%
   geom_smooth(aes(y = avg_new_7_day_pm, color = "blue"), se = FALSE, span = 0.5) +
   geom_line(aes(y = pred_loess7, color = "red"))
 
-owid %>%
-  left_join(model_fitted_loess_daily %>% select(iso3c, date, pred_loess_daily = .fitted)) %>%
-  filter(iso3c == "BGD") %>%
-  ggplot(aes(x = date)) +
-  geom_line(aes(y = new_cases_per_million)) +
-  geom_line(aes(y = pred_loess_daily, color = "LOESS\nSmoothed")) +
-  scale_x_date(date_breaks = "2 weeks", date_labels = "%b %d") +
-  labs(x = "", y = "New daily cases per million",
-       title = "Bangladesh") +
-  theme(axis.text.x = element_text(angle = 90), legend.title = element_blank())
-ggsave("Output/BGD smoothed per million.png", dpi = 600)
 
+### Calculate direction in trend ####
+# Idea is to predict based on differences in 31 day and 61 day curve where
+# cases are increasing/decreasing
 
-
-# Calculate direction in trend
 diff_test <- model_fitted_lm_31 %>%
   select(country, iso3c, date, avg_new_31_day_pm, fit_31_day = .fitted, se_31_day = .se.fit) %>%
   left_join(model_fitted_lm_61 %>% select(country, iso3c, date, avg_new_61_day_pm, fit_61_day = .fitted)) %>%
@@ -329,28 +331,30 @@ diff_test <- model_fitted_lm_31 %>%
   group_by(country, iso3c, incgroup) %>%
   filter(date == max(date, na.rm = TRUE)) %>%
   ungroup() %>%
+  # We call a country's status increasing if the average 31 day average
+  # is greater than the 61 day average (i.e. more cases on average in last month than
+  # in previous two months) and if this difference is greater than twice the Standard Error
+  # of the 31 day average.
+  # The reverse applies for Decreasing trends.
+  # Where neither is applicable, we call the trend uncertain.
   mutate(status = case_when(
     (avg_new_31_day_pm - avg_new_61_day_pm > 0) & (abs(avg_new_31_day_pm - avg_new_61_day_pm) >= 2*se_31_day) ~ "Increasing",
     (avg_new_31_day_pm - avg_new_61_day_pm < 0) & (abs(avg_new_31_day_pm - avg_new_61_day_pm) >= 2*se_31_day) ~ "Decreasing",
     TRUE ~ "Uncertain"
   ))
 
-diff_test %>%
-  count(status)
-
-diff_test %>%
-  filter(status == "Increasing") %>%
-  count(avg_new_31_day_pm > avg_new_61_day_pm)
-
-diff_test_15Sep %>% 
-  left_join(diff_test, by = c("country", "iso3c", "incgroup")) %>% 
-  filter(status.x != status.y) %>% 
-  select(country, status.x, status.y)
-
+# Export list of countries and trend status
 diff_test %>%
   writexl::write_xlsx("Data/Output Data/Difference in moving averages.xlsx")
 
-owid_test %>% 
+
+
+
+
+
+
+# Extra example of nice graph with new cases, 31/61 day average, and vertical line.
+owid_maxima %>% 
   filter(country == "Gambia") %>% 
   ggplot(aes(x = date)) + 
   geom_line(aes(y = avg_new_61_day_pm, color = "black")) + 
@@ -370,86 +374,3 @@ owid_test %>%
 
 ggsave("Output/Gambia example.png", dpi = 600)
 
-# How to do this with Exponential growth?
-# Seems to have to do with NLS
-
-
-# Checking model outputs correct coefficients pasting linear
-# equation on trendline
-owid_trend %>%
-  ungroup() %>%
-  filter(iso3c == "NGA") %>%
-  ggplot(aes(x = date, y = avg_new_14_day_pm)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  geom_text(date = 2020-08-03, avg_new_14_day_pm = 14, label = lm_eq(owid_trend %>% ungroup() %>% filter(iso3c == "NGA")), parse = TRUE)
-
-lm_eq <- function(df){
-  
-  m <- lm(avg_new_14_day_pm ~ date, df);
-  
-  eq <- substitute((y) == a + b %.% (x)*","~~(r)^2~"="~r2, 
-                   
-                   list(a = format(unname(coef(m)[1]), digits = 2),
-                        
-                        b = format(unname(coef(m)[2]), digits = 2),
-                        
-                        r2 = format(summary(m)$r.squared, digits = 3)))
-  
-  as.character(as.expression(eq));
-  
-}
-lm_eq <- function(df){
-  
-  m <- lm(avg_new_14_day_pm ~ date, df);
-  
-  eq <- substitute((y) == a + b %.% (x)*","~~(r)^2~"="~r2, 
-                   
-                   list(a = format(unname(coef(m)[1]), digits = 2),
-                        
-                        b = format(unname(coef(m)[2]), digits = 2),
-                        
-                        r2 = format(summary(m)$r.squared, digits = 3)))
-  
-  as.character(as.expression(eq));
-  
-}
-
-owid %>%
-  filter(avg_new_7_day > avg_new_31_day) %>%
-  arrange(desc(avg_new_7_day)) %>%
-  select(country, avg_new_7_day, avg_new_31_day)
-
-owid %>%
-  mutate(delta_cases = (avg_new_7_day - avg_new_31_day)/avg_new_31_day) %>%
-  arrange(desc(delta_cases)) %>%
-  filter(incgroup != "High income", avg_new_7_day > avg_new_31_day) %>%
-  select(country, avg_new_7_day, avg_new_31_day)
-
-owid %>%
-  filter(location %in% c("United States", "Germany", "India")) %>%
-  ggplot(aes(x = date, y = avg_14_day, color = location)) +
-  geom_line()
-
-test <- read_csv("Data/Input Data/owid-covid-data-23Jul.csv", guess_max = 33000) %>%
-  group_by(iso_code) %>%
-  arrange(iso_code, date) %>%
-  filter(!is.na(new_cases_per_million))
-
-# Possible function for logest
-logest <- function(y, x, ...){
-  if(missing(x) || is.null(x)) x <- seq_along(y)
-  result <- lm(log(y + 0.0000000001) ~ x, ...)
-  (exp(result$coefficients[2]) - 1)*100
-}
-
-# Add columns to dataframe to test logest results from Eric's worksheet
-test$avg_7_day <- slider::slide_dbl(test$new_cases_per_million, ~logest(.x), .before = 6)
-test$avg_31_day <- slider::slide_dbl(test$new_cases_per_million, ~logest(.x), .before = 30)
-
-
-# Similar way of doing it via broom package
-# From here http://r4stats.com/2017/04/18/group-by-modeling-in-r-made-easy/
-do(test,
-   tidy(
-     lm(log(new_cases_per_million + 1) ~ seq_along(new_cases_per_million), data = .)))
