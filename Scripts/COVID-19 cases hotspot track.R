@@ -1,5 +1,7 @@
 library(tidyverse)
 
+### Importing Data ####
+# Import country codes
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
   # Clean all variable names by converting to snake case
   janitor::clean_names() %>% 
@@ -14,9 +16,18 @@ odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
   mutate(un_code = as.numeric(un_code), 
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
 
+# Import latest COVID-19 data from Our World in Data
+# See project page here https://ourworldindata.org/coronavirus
 owid <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 10000) %>%
+  # Create rolling averages ending with date x.
+  # For example, if day is Sunday, this will construct 7 day rolling
+  # average from previous Monday ending in Sunday.
   group_by(iso_code) %>%
+  # Make sure it's sorted correctly with latest date (in date format)
+  # at the end
   arrange(iso_code, date) %>%
+  # Create averages for new cases as well as new cases per million
+  # Also doing deaths, have not used so far.
   mutate(avg_new_7_day = slider::slide_dbl(new_cases, ~mean(.x), .before = 6),
          avg_new_14_day = slider::slide_dbl(new_cases, ~mean(.x), .before = 13),
          avg_new_31_day = slider::slide_dbl(new_cases, ~mean(.x), .before = 30),
@@ -28,25 +39,32 @@ owid <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/pu
          avg_newd_14_day_pm = slider::slide_dbl(new_deaths_per_million, ~mean(.x), .before = 13),
          avg_newd_31_day_pm = slider::slide_dbl(new_deaths_per_million, ~mean(.x), .before = 30),
          avg_newd_61_day_pm = slider::slide_dbl(new_deaths_per_million, ~mean(.x), .before = 60)) %>%
-  # Keep only latest datapoint (under sorting by country and date, latest date)
   # filter(row_number() == max(row_number(), na.rm = TRUE)) %>%
   ungroup() %>%
+  # Fix iso code for Kosovo ahead of merging
   mutate(iso_code = case_when(
     location == "Kosovo" ~ "XKX",
     TRUE ~ iso_code
   )) %>%
+  # Merge in country groups
   left_join(odw_master_codes, by = c("iso_code" = "iso3c")) %>%
+  # Drop World and International aggregates
   filter(!location %in% c("World", "International")) %>%
+  # Keep only select variables
   select(iso3c = iso_code, date, country = location, new_cases, new_cases_per_million,
          avg_new_7_day, avg_new_14_day, avg_new_31_day,
          avg_new_7_day_pm, avg_new_14_day_pm, avg_new_31_day_pm, avg_new_61_day_pm,
          new_deaths, new_deaths_per_million, avg_newd_7_day_pm, avg_newd_14_day_pm, avg_newd_31_day_pm, avg_newd_61_day_pm,
          incgroup, wbregion, lending_cat) %>%
+  # Sort again just in case
   arrange(iso3c, date)
 
+# One way of finding local maxima
 # Find local maxima
-owid_test <- owid %>%
+owid_maxima <- owid %>%
   mutate(local_max_cases = if_else(
+    # Condition if value of day's 61 day average is greater than preceding and
+    # succeeding 7 days.
     lag(avg_new_61_day_pm, n = 7) < avg_new_61_day_pm &
     lag(avg_new_61_day_pm, n = 6) < avg_new_61_day_pm &
     lag(avg_new_61_day_pm, n = 5) < avg_new_61_day_pm &
@@ -60,16 +78,9 @@ owid_test <- owid %>%
       lead(avg_new_61_day_pm, n = 4) < avg_new_61_day_pm &
       lead(avg_new_61_day_pm, n = 5) < avg_new_61_day_pm &
       lead(avg_new_61_day_pm, n = 6) < avg_new_61_day_pm &
-      lead(avg_new_61_day_pm, n = 7) < avg_new_61_day_pm, TRUE, FALSE),
-    local_max_deaths = if_else(
-      lag(avg_newd_61_day_pm, n = 4) < avg_newd_61_day_pm & 
-      lag(avg_newd_61_day_pm, n = 3) < avg_newd_61_day_pm & 
-        lag(avg_newd_61_day_pm, n = 2) < avg_newd_61_day_pm & 
-        lag(avg_newd_61_day_pm) < avg_newd_61_day_pm & 
-        lead(avg_newd_61_day_pm) < avg_newd_61_day_pm & 
-        lead(avg_newd_61_day_pm, n = 2) < avg_newd_61_day_pm &
-        lead(avg_newd_61_day_pm, n = 3) < avg_newd_61_day_pm &
-        lead(avg_newd_61_day_pm, n = 4) < avg_newd_61_day_pm, TRUE, FALSE)) %>%
+      lead(avg_new_61_day_pm, n = 7) < avg_new_61_day_pm, TRUE, FALSE)) %>%
+  # Create maxima at last (most recent) date if it's at the end of an increase
+  # If value is greater than the average of last seven days
   group_by(iso3c) %>%
   mutate(local_max_cases = case_when(
     date == max(date, na.rm = TRUE) & 
@@ -78,9 +89,9 @@ owid_test <- owid %>%
         lag(avg_new_61_day_pm, n = 6),
         lag(avg_new_61_day_pm, n = 5),
         lag(avg_new_61_day_pm, n = 4),
-                               lag(avg_new_61_day_pm, n = 3),
-                               lag(avg_new_61_day_pm, n = 2),
-                               lag(avg_new_61_day_pm)), na.rm = TRUE) ~ TRUE,
+        lag(avg_new_61_day_pm, n = 3),
+        lag(avg_new_61_day_pm, n = 2),
+        lag(avg_new_61_day_pm)), na.rm = TRUE) ~ TRUE,
     TRUE ~ local_max_cases
   )) %>%
   ungroup()
