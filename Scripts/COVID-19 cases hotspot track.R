@@ -173,7 +173,7 @@ owid_trend <- owid %>%
   # Drop NA average new cases. Breaks model otherwise.
   # This should only drop HK, where no info is available
   # Additional filter :, date <= as.Date("2020-09-10")
-  filter(iso3c != "HKG") %>%
+  filter(iso3c != "HKG", date <= as.Date("2020-10-16")) %>%
   # Keep last four weeks
   group_by(country, iso3c)# %>%
   # Date format can be modified like numeric!
@@ -289,7 +289,7 @@ model_fitted_loess_daily <- model_fitted_loess_daily %>%
 model_fitted_loess_daily %>%
   select(country, iso3c, date, `New cases per million` = new_cases_per_million, `New cases per million LOESS smoothed` = .fitted,
          peak, trough, `Average new cases per million over last 2 months` = last_two_avg) %>%
-  write_csv("Data/Output Data/New cases smoothed.csv", na = "")
+  write_csv("Output/New cases smoothed.csv", na = "")
 
 # Master graph for daily cases, smoothed new cases, peaks, troughs and
 # Last two months average
@@ -345,7 +345,7 @@ diff_test <- model_fitted_lm_31 %>%
 
 # Export list of countries and trend status
 diff_test %>%
-  writexl::write_xlsx("Data/Output Data/Difference in moving averages.xlsx")
+  writexl::write_xlsx("Output/Difference in moving averages16Oct.xlsx")
 
 
 
