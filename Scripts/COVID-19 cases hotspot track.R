@@ -173,7 +173,7 @@ owid_trend <- owid %>%
   # Drop NA average new cases. Breaks model otherwise.
   # This should only drop HK, where no info is available
   # Additional filter :, date <= as.Date("2020-09-10")
-  filter(iso3c != "HKG", date <= as.Date("2020-10-16")) %>%
+  filter(iso3c != "HKG", date >= as.Date("2020-05-01"), date <= as.Date("2020-10-16")) %>%
   # Keep last four weeks
   group_by(country, iso3c)# %>%
   # Date format can be modified like numeric!
@@ -345,8 +345,8 @@ diff_test <- model_fitted_lm_31 %>%
 
 # Export list of countries and trend status
 diff_test %>%
-  select(country, iso3c, end_date = date, `31-day average of new cases per million` = avg_new_31_day_pm,
-         `61-day average of new cases per million` = avg_new_61_day_pm, `Standard Error 31-day average series` = se_31_day,
+  select(country, iso3c, end_date = date, `31-day average of new cases per million on end_date` = avg_new_31_day_pm,
+         `61-day average of new cases per million on end_date` = avg_new_61_day_pm, `Standard Error 31-day average series` = se_31_day,
          incgroup, status) %>%
   writexl::write_xlsx("Output/Difference in moving averages16Oct.xlsx")
 
