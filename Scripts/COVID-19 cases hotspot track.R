@@ -326,6 +326,7 @@ owid %>%
 diff_test <- model_fitted_lm_31 %>%
   select(country, iso3c, date, avg_new_31_day_pm, fit_31_day = .fitted, se_31_day = .se.fit) %>%
   left_join(model_fitted_lm_61 %>% select(country, iso3c, date, avg_new_61_day_pm, fit_61_day = .fitted)) %>%
+  left_join(owid %>% select(iso3c, date, avg_newd_31_day_pm, avg_newd_61_day_pm), by = c("iso3c", "date")) %>%
   left_join(odw_master_codes %>% select(iso3c, incgroup)) %>%
   filter(incgroup %in% c("Low income", "Lower middle income")) %>%
   group_by(country, iso3c, incgroup) %>%
@@ -347,7 +348,8 @@ diff_test <- model_fitted_lm_31 %>%
 diff_test %>%
   select(country, iso3c, end_date = date, `31-day average of new cases per million on end_date` = avg_new_31_day_pm,
          `61-day average of new cases per million on end_date` = avg_new_61_day_pm, `Standard Error 31-day average series` = se_31_day,
-         incgroup, status) %>%
+         incgroup, `Status of cases` = status, `31-day average of new deaths per million on end_date` = avg_newd_31_day_pm,
+         `61-day average of new deaths per million on end_date` = avg_newd_61_day_pm) %>%
   writexl::write_xlsx("Output/Difference in moving averages16Oct.xlsx")
 
 
