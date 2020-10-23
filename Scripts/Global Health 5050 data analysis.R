@@ -6,7 +6,7 @@ library(tidyverse)
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
 month <- "10"
-day <- "06"
+day <- "19"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -121,7 +121,7 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
   mutate(
     # Use provided ISO2 country codes to assign country codes to countries. Will trigger warning that
     # Some values were not matched unambiguously.
-    # This will be because nations of UK won't be matched, we're
+    # This will be because nations of UK and some others won't be matched, we're
     # cleaning them separately below.
   iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
   iso3c = case_when(
@@ -129,6 +129,10 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     country == "Wales" ~ "WAL",
     country == "Scotland" ~ "SCO",
     country == "Northern Ireland" ~ "NIR",
+    country == "Guernsey" ~ "GGY",
+    country == "Jersey" ~ "JEY",
+    country == "Sao Tome and Principe" ~ "STP",
+    country == "Seychelles" ~ "SYC",
     TRUE ~ iso3c
   ),
   # Add source name
