@@ -46,7 +46,7 @@ owid <- owid_raw %>%
   # Then keep distinct (in this case first) observation by iso3 code 
   # and country name. Will keep Gh5050 update day for countries that 
   # have it and will keep latest update for countries that don't
-  # As of August 8, 212 location available, that should be number of obs
+  # As of October 23, 213 location available, that should be number of obs
   # in dataset
   distinct(iso_code, location, .keep_all = TRUE) %>%
   # Keep only variables we want
@@ -197,6 +197,91 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
 
 
 ### ANALYSIS ####
+
+### Disaggregation in the last month
+# Because of the issue of countries reporting cases and/or deaths
+# by sex only once since the start of the pandemic, we want to get a sense
+# of the coverage of regularly produced sex-disaggregated stats.
+# GH5050 uses whether or not countries report in the last month as an
+# indicator, so we're copying that approach here.
+
+
+# CASES
+owid %>%
+  # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
+  filter(!country.x %in% c("World", "International")) %>%
+  # Clean country name variables
+  select(-country.y) %>%
+  rename(country = country.x) %>%
+  # Merge in GH5050 countries and sex-disaggregation status
+  left_join(covid_deaths_cases %>% 
+              # Filter for countries which have sex-disaggregated cases in the last month
+              filter(cases_date >= max(cases_date, na.rm = TRUE) - 31) %>%
+              # Assign these countries binary indicator last_month_cases
+              mutate(last_month_cases = 1) %>%
+              # Drop four nations of UK
+              filter(!iso3c %in% c("ENG", "WAL", "SCO", "NIR")) %>%
+              # Add row for UK, assign that they have cases SDD in last month.
+              # HOW TO DYNAMICALLY CHECK?
+              add_row(iso3c = "GBR", country = "United Kingdom", last_month_cases = 1) %>%
+              # keep only iso3c and binary indicator
+              select(iso3c, last_month_cases)) %>%
+  # Clean sex-disaggregated status indicator
+  mutate(last_month_cases = case_when(
+    is.na(last_month_cases) ~ 0,
+    TRUE ~ last_month_cases
+  )) %>%
+  # Add together cases by whether or not country groups had SDD in last month
+  group_by(last_month_cases) %>%
+  summarize(sum_cases = sum(total_cases, na.rm = TRUE), num_countries = n_distinct(iso3c)) %>%
+  ungroup() %>%
+  # Add totals line
+  janitor::adorn_totals() %>%
+  # Reshape so we can divide cases totals by group.
+  pivot_wider(-num_countries, names_from = last_month_cases, names_prefix = "total_cases_",
+              values_from = sum_cases) %>%
+  mutate(share_last_month_cases = total_cases_1/total_cases_Total)
+
+# DEATHS
+owid %>%
+  # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
+  filter(!country.x %in% c("World", "International")) %>%
+  # Clean country name variables
+  select(-country.y) %>%
+  rename(country = country.x) %>%
+  # Merge in GH5050 countries and sex-disaggregation status
+  left_join(covid_deaths_cases %>% 
+              # Filter for countries which have sex-disaggregated deaths in the last month
+              filter(deaths_date >= max(deaths_date, na.rm = TRUE) - 31) %>%
+              # Assign these countries binary indicator last_month_deaths
+              mutate(last_month_deaths = 1) %>%
+              # Drop four nations of UK
+              filter(!iso3c %in% c("ENG", "WAL", "SCO", "NIR")) %>%
+              # Add row for UK, assign that they have deaths SDD in last month.
+              # HOW TO DYNAMICALLY CHECK?
+              add_row(iso3c = "GBR", country = "United Kingdom", last_month_deaths = 1) %>%
+              # keep only iso3c and binary indicator
+              select(iso3c, last_month_deaths)) %>%
+  # Clean sex-disaggregated status indicator
+  mutate(last_month_deaths = case_when(
+    is.na(last_month_deaths) ~ 0,
+    TRUE ~ last_month_deaths
+  )) %>%
+  # Add together cases by whether or not country groups had SDD in last month
+  group_by(last_month_deaths) %>%
+  summarize(sum_deaths = sum(total_deaths, na.rm = TRUE), num_countries = n_distinct(iso3c)) %>%
+  ungroup() %>%
+  # Add totals line
+  janitor::adorn_totals() %>%
+  # Reshape so we can divide cases totals by group.
+  pivot_wider(-num_countries, names_from = last_month_deaths, names_prefix = "total_deaths_",
+              values_from = sum_deaths) %>%
+  mutate(share_last_month_deaths = total_deaths_1/total_deaths_Total)
+
+
+
+
+### TABLES BELOW ARE IF A COUNTRY HAS EVER HAD SDD
 
 ### Table 1
 # Create master table of information for 1. Number of countries that
