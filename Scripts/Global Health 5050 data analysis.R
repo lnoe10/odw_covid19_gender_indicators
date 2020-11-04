@@ -1,5 +1,6 @@
+library(httr)
+library(jsonlite)
 library(tidyverse)
-
 
 ### IMPORT RAW DATA ####
 
@@ -24,8 +25,28 @@ odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
 
 # Import Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
-covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day,".csv"), na = "") %>%
-  janitor::clean_names() 
+# Get
+get_data <- GET("https://api.globalhealth5050.org/api/v1/summary")
+get_data_text <- content(get_data, "text")
+get_data_json <- fromJSON(get_data_text, flatten = TRUE)
+
+# Initialize empty dataframe
+df <- data.frame()
+for (i in 1:length(get_data_json$data)){
+  country_df <- as.data.frame(get_data_json$data[i], col.names = "GH5050")
+  df <- df %>%
+    bind_rows(country_df)
+}
+# Clean up
+df_clean <- df %>%
+  # Make column names nice by removing GH5050 slug
+  rename_with(~str_remove(., "GH5050.")) %>%
+  # clean column types
+  mutate(across(contains("date"), ~lubridate::mdy(.x)),
+         across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
+         across(where(is.factor), as.character),
+         iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"))
+
 
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
 # appending latest date if Gh5050 date isn't available.
