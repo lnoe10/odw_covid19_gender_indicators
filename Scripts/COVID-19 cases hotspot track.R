@@ -113,12 +113,22 @@ last_point <- owid_maxima %>%
   filter(date <= lubridate::ymd("2020-10-16")) %>%
   group_by(iso3c) %>%
   slice(which.max(date)) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(country = case_when(
+    iso3c == "CPV" ~ "Cabo Verde",
+    iso3c == "SWZ" ~ "Eswatini",
+    TRUE ~ country
+  ))
 
 # Chart of trends of 61 day averages with country label on last point
 # For, at the time, cluster 3 countries
 owid_maxima %>% 
   filter(iso3c %in% c("CPV", "SWZ", "BGD", "UKR"), date <= lubridate::ymd("2020-10-16")) %>% 
+  mutate(country = case_when(
+    iso3c == "CPV" ~ "Cabo Verde",
+    iso3c == "SWZ" ~ "Eswatini",
+    TRUE ~ country
+  )) %>%
   ggplot(aes(x = date, y = avg_new_61_day_pm, color = country)) + 
   geom_line() + 
   geom_text(data = last_point %>%
