@@ -121,7 +121,8 @@ last_point <- owid_maxima %>%
   ))
 
 # Chart of trends of 61 day averages with country label on last point
-# For, at the time, cluster 3 countries
+# For, at the time, cluster 2 and 3 countries
+# This graph represents Figure 1 in the vulnerability piece
 owid_maxima %>% 
   filter(iso3c %in% c("CPV", "SWZ", "BGD", "UKR"), date <= lubridate::ymd("2020-10-16")) %>% 
   mutate(country = case_when(
@@ -136,8 +137,7 @@ owid_maxima %>%
                            aes(x = date, y = avg_new_61_day_pm, color = country, label = country, hjust = 0)) + 
   scale_x_date(date_breaks = "2 weeks", date_labels = "%b %d", limits = c(lubridate::ymd("2020-03-20"), lubridate::ymd("2020-11-10"))) +
   scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100, 120), expand = expand_scale(mult = c(0, .1))) +
-  labs(x = "", y = "Rolling average of new cases\nper million over two months",
-       title = "Highest number of new cases per million among LIC and LMC") +
+  labs(x = "", y = "Rolling average of new cases\nper million over two months") +
   theme(axis.text.x = element_text(angle = 90), legend.position = "none", panel.background = element_blank(), panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(linetype = "dotted", size=.1, color="gray" ), axis.line = element_line(colour = "black"))
 
