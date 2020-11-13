@@ -6,8 +6,8 @@ library(tidyverse)
 
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
-month <- "10"
-day <- "19"
+month <- "11"
+day <- "02"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -69,6 +69,11 @@ gh5050_historical <- df %>%
          across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
          across(where(is.factor), as.character),
          iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"))
+
+# Import static csv to check against API call
+covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker 1102.csv") %>%
+  janitor::clean_names()
+#### CONTINUE BELOW, CHECK AGAINST df_clean
 
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
 # appending latest date if Gh5050 date isn't available.
