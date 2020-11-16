@@ -7,7 +7,7 @@ library(tidyverse)
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
 month <- "11"
-day <- "02"
+day <- "16"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -45,7 +45,12 @@ df_clean <- df %>%
   mutate(across(contains("date"), ~lubridate::mdy(.x)),
          across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
          across(where(is.factor), as.character),
-         iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"))
+         iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+         iso3c = case_when(
+           country_code == "SAO" ~ "STP",
+           country_code == "SEY" ~ "SYC",
+           TRUE ~ iso3c
+         ))
 
 # Import historical Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
 # Get
@@ -71,7 +76,7 @@ gh5050_historical <- df %>%
          iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"))
 
 # Import static csv to check against API call
-covid_deaths_cases_raw <- read_csv("Input/GH5050 Covid-19 sex-disaggregated data tracker 1102.csv") %>%
+covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day, ".csv")) %>%
   janitor::clean_names()
 #### CONTINUE BELOW, CHECK AGAINST df_clean
 
