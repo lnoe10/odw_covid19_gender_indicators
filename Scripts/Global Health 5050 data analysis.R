@@ -284,6 +284,10 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
 
 ### ANALYSIS ####
 
+###
+### Can use gh5050_historical for this now, ignore below until Table 1
+###
+
 ### Disaggregation in the last month
 # Because of the issue of countries reporting cases and/or deaths
 # by sex only once since the start of the pandemic, we want to get a sense
