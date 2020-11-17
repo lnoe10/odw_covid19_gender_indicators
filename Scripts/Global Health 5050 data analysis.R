@@ -1,12 +1,13 @@
+library(httr)
+library(jsonlite)
 library(tidyverse)
-
 
 ### IMPORT RAW DATA ####
 
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
-month <- "10"
-day <- "19"
+month <- "11"
+day <- "16"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -24,8 +25,89 @@ odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
          incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
 
 # Import Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
-covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day,".csv"), na = "") %>%
-  janitor::clean_names() 
+# See documentation here: https://api.globalhealth5050.org/docs/
+# Get
+get_data <- GET("https://api.globalhealth5050.org/api/v1/summary?data=fullvars")
+get_data_text <- content(get_data, "text")
+get_data_json <- fromJSON(get_data_text, flatten = TRUE)
+
+# Initialize empty dataframe
+df <- data.frame()
+for (i in 1:length(get_data_json$data)){
+  country_df <- as.data.frame(get_data_json$data[i], col.names = "GH5050")
+  df <- df %>%
+    bind_rows(country_df)
+}
+# Clean up
+df_clean <- df %>%
+  # Make column names nice by removing GH5050 slug
+  rename_with(~str_remove(., "GH5050.")) %>%
+  # clean column types
+  mutate(across(contains("date"), ~lubridate::mdy(.x)),
+         across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
+         across(where(is.factor), as.character),
+         # Add country codes
+         iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+         iso3c = case_when(
+           # Fix ISO codes from import
+           country_code == "SAO" ~ "STP",
+           country_code == "SEY" ~ "SYC",
+           # Add country codes for nations of UK for easier merging
+           country == "England" ~ "ENG",
+           country == "Wales" ~ "WAL",
+           country == "Scotland" ~ "SCO",
+           country == "Northern Ireland" ~ "NIR",
+           country == "England Wales and Northern Ireland" ~ "EWN",
+           TRUE ~ iso3c
+         ))
+
+# Import historical Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
+# For historical analysis
+# Get
+get_historical <- GET("https://api.globalhealth5050.org/api/v1/summary?data=historic")
+get_historical_text <- content(get_historical, "text")
+get_historical_json <- fromJSON(get_historical_text, flatten = TRUE)
+
+# Initialize empty dataframe
+df <- data.frame()
+for (i in 1:length(get_historical_json$data)){
+  country_df <- as.data.frame(get_historical_json$data[i], col.names = "GH5050")
+  df <- df %>%
+    bind_rows(country_df)
+}
+# Clean up
+gh5050_historical <- df %>%
+  # Make column names nice by removing GH5050 slug
+  rename_with(~str_remove(., "GH5050.")) %>%
+  # clean column types
+  mutate(across(contains("date"), ~lubridate::mdy(.x)),
+         across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
+         across(where(is.factor), as.character),
+         iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"))
+
+# Import static csv to check against API call (don't need to do this every time)
+covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day, ".csv"), na = "") %>%
+  janitor::clean_names() %>%
+  mutate(iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+         iso3c = case_when(
+           # Fix ISO codes from import
+           country_code == "SAO" ~ "STP",
+           country_code == "SEY" ~ "SYC",
+           # Add country codes for nations of UK for easier merging
+           country == "England" ~ "ENG",
+           country == "Wales" ~ "WAL",
+           country == "Scotland" ~ "SCO",
+           country == "Northern Ireland" ~ "NIR",
+           country == "England Wales and Northern Ireland" ~ "EWN",
+           TRUE ~ iso3c
+         ),
+         # Clean date formats
+         across(contains("date"), ~lubridate::dmy(.x)),
+         # Clean rates of cases and deaths
+         across(contains("percent"), ~as.numeric(str_remove(.x, "%"))/100)) %>%
+  rename(cases_total_sum = cases_where_sex_disaggregated_data_is_available,
+         deaths_total_sum = deaths_where_sex_disaggregated_data_is_available)
+
 
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
 # appending latest date if Gh5050 date isn't available.
@@ -59,16 +141,17 @@ owid <- owid_raw %>%
   # Add country grouping info
   left_join(odw_master_codes, by = c("iso3c"))
 
-# Import countries that have sex AND age disaggregation for cases and deaths
-# Also from Global Health 5050
-covid_age_sex <- read_csv("Input/gh_sex_age_Jul24.csv") %>%
-  filter(country != "Scotland") %>%
-  mutate(
-    country = case_when(
-      country == "England" ~ "United Kingdom",
-      TRUE ~ country
-    ),
-    iso3c = countrycode::countrycode(country, "country.name", "iso3c"))
+# This can now be accessed via API as well.
+# # Import countries that have sex AND age disaggregation for cases and deaths
+# # Also from Global Health 5050
+# covid_age_sex <- read_csv("Input/gh_sex_age_Jul24.csv") %>%
+#   filter(country != "Scotland") %>%
+#   mutate(
+#     country = case_when(
+#       country == "England" ~ "United Kingdom",
+#       TRUE ~ country
+#     ),
+#     iso3c = countrycode::countrycode(country, "country.name", "iso3c"))
 
 # Import 2019 Population from UN World Population prospects 2019
 # This is a filtered CSV of the "Total Population", "All variants" file
@@ -115,6 +198,9 @@ world_pop_female <- world_pop %>% pull(pop_female)
 
 ### ADDITIONAL PROCESSING ####
 
+###
+################ This will now be started by df_clean
+###
 # Creating master dataset out of GH5050 datasets
 covid_deaths_cases <- covid_deaths_cases_raw %>%
   # Additional clean and add relevant indicators
@@ -197,6 +283,10 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
 
 
 ### ANALYSIS ####
+
+###
+### Can use gh5050_historical for this now, ignore below until Table 1
+###
 
 ### Disaggregation in the last month
 # Because of the issue of countries reporting cases and/or deaths
