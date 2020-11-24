@@ -198,34 +198,12 @@ world_pop_female <- world_pop %>% pull(pop_female)
 
 ### ADDITIONAL PROCESSING ####
 
-###
-################ This will now be started by df_clean
-###
 # Creating master dataset out of GH5050 datasets
-covid_deaths_cases <- covid_deaths_cases_raw %>%
+covid_deaths_cases <- df_clean %>%
   # Additional clean and add relevant indicators
   mutate(
-    # Use provided ISO2 country codes to assign country codes to countries. Will trigger warning that
-    # Some values were not matched unambiguously.
-    # This will be because nations of UK and some others won't be matched, we're
-    # cleaning them separately below.
-  iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
-  iso3c = case_when(
-    country == "England" ~ "ENG",
-    country == "Wales" ~ "WAL",
-    country == "Scotland" ~ "SCO",
-    country == "Northern Ireland" ~ "NIR",
-    country == "Guernsey" ~ "GGY",
-    country == "Jersey" ~ "JEY",
-    country == "Sao Tome and Principe" ~ "STP",
-    country == "Seychelles" ~ "SYC",
-    TRUE ~ iso3c
-  ),
   # Add source name
   source_name = "Global Health 50/50",
-  # Clean date columns to enable comparison of dates
-  cases_date = lubridate::dmy(cases_date),
-  deaths_date = lubridate::dmy(deaths_date),
   # Create own sex-disaggregated status variable to reflect differences in reporting cases and deaths
   # New Gh5050 makes Both equal "country has ever reported data on both cases and deaths at the same time point."
   # For our purposes, not important for the moment, so go with whether
@@ -233,18 +211,13 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
   # Use cases_date and deaths_date for this, since if cases or deaths are 0,
   # even though they're disaggregated, the columns for percent_male will be NA, rather than 0.
   disaggregated_status = case_when(
-    !is.na(cases_date) & !is.na(deaths_date) ~ "Both",
-    !is.na(cases_date) & is.na(deaths_date) ~ "Cases only",
-    is.na(cases_date) & !is.na(deaths_date) ~ "Deaths only",
+    !is.na(date_cases) & !is.na(date_deaths) ~ "Both",
+    !is.na(date_cases) & is.na(date_deaths) ~ "Cases only",
+    is.na(date_cases) & !is.na(date_deaths) ~ "Deaths only",
     TRUE ~ "None"
-  ),
-  # Clean rates of cases and deaths
-  cases_percent_male = as.numeric(str_remove(cases_percent_male, "%")),
-  cases_percent_female = as.numeric(str_remove(cases_percent_female, "%")),
-  deaths_percent_male = as.numeric(str_remove(deaths_percent_male, "%")),
-  deaths_percent_female = as.numeric(str_remove(deaths_percent_female, "%"))) %>%
-  # Make sure we have no duplicates (older versions had them, so just to be safe)
-  distinct(iso3c, .keep_all = TRUE) %>%
+  )) %>%
+  # Drop empty observations
+  filter(!is.na(iso3c)) %>%
   # Import population from UN WPP, see above
   left_join(pop_2019 %>% select(-c(country))) %>%
   # Add country groups
@@ -277,9 +250,7 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     iso3c == "SCO" ~ "..",
     iso3c == "NIR" ~ "..",
     TRUE ~ lending_cat
-  )) %>%
-  rename(total_cases = cases_where_sex_disaggregated_data_is_available,
-         total_deaths = deaths_where_sex_disaggregated_data_is_available)
+  ))
 
 
 ### ANALYSIS ####
