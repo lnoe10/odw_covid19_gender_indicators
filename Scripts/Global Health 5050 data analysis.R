@@ -200,7 +200,6 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
       country == "Wales" ~ "WAL",
       country == "Scotland" ~ "SCO",
       country == "Northern Ireland" ~ "NIR",
-      country == "England Wales and Northern Ireland" ~ "EWN",
       TRUE ~ iso3c
     ),
     # Add source name
