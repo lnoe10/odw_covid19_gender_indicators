@@ -33,6 +33,8 @@ get_data_json <- fromJSON(get_data_text, flatten = TRUE)
 
 # Initialize empty dataframe
 covid_deaths_cases_raw <- data.frame()
+# Run loop through JSON list to extract line of data for every country
+# and append to empty dataframe
 for (i in 1:length(get_data_json$data)){
   country_df <- as.data.frame(get_data_json$data[i], col.names = "GH5050")
   covid_deaths_cases_raw <- covid_deaths_cases_raw %>%
@@ -48,21 +50,14 @@ get_historical_text <- content(get_historical, "text")
 get_historical_json <- fromJSON(get_historical_text, flatten = TRUE)
 
 # Initialize empty dataframe
-df <- data.frame()
+gh5050_historical_raw <- data.frame()
+# Run loop through JSON list to extract line of data for every country
+# and append to empty dataframe
 for (i in 1:length(get_historical_json$data)){
   country_df <- as.data.frame(get_historical_json$data[i], col.names = "GH5050")
-  df <- df %>%
+  gh5050_historical_raw <- gh5050_historical_raw %>%
     bind_rows(country_df)
 }
-# Clean up
-gh5050_historical <- df %>%
-  # Make column names nice by removing GH5050 slug
-  rename_with(~str_remove(., "GH5050.")) %>%
-  # clean column types
-  mutate(across(contains("date"), ~lubridate::mdy(.x)),
-         across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
-         across(where(is.factor), as.character),
-         iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"))
 
 ## Import static csv to check against API call (don't need to do this every time)
 #covid_deaths_cases_static <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day, ".csv"), na = "") %>%
@@ -251,6 +246,69 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     iso3c == "NIR" ~ "..",
     TRUE ~ lending_cat
   ))
+
+# Clean up
+gh5050_historical <- gh5050_historical_raw %>%
+  # Make column names nice by removing GH5050 slug
+  rename_with(~str_remove(., "GH5050.")) %>%
+  # clean column types
+  mutate(
+    # Convert date columns to date format
+    across(contains("date"), ~lubridate::mdy(.x)),
+    # Convert columns with numeric info to numeric (currently in factor, need to convert to character, then numeric)
+    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
+    # Convert remaining factor variables to character variables
+    across(where(is.factor), as.character),
+    # Add country codes
+    iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+    iso3c = case_when(
+      # Fix ISO codes from import
+      country_code == "SAO" ~ "STP",
+      country_code == "SEY" ~ "SYC",
+      # Add country codes for nations of UK for easier merging
+      country == "England" ~ "ENG",
+      country == "Wales" ~ "WAL",
+      country == "Scotland" ~ "SCO",
+      country == "Northern Ireland" ~ "NIR",
+      # API imports character column country_code NA as NA missing
+      country == "Namibia" ~ "NAM",
+      TRUE ~ iso3c
+    )) %>%
+  # Drop empty observations
+  filter(!is.na(iso3c)) %>%
+  # Import population from UN WPP, see above
+  left_join(pop_2019 %>% select(-c(country))) %>%
+  # Add country groups
+  left_join(odw_master_codes %>% select(-c(country, un_code))) %>%
+  mutate(incgroup = as.character(incgroup),
+         incgroup = case_when(
+           iso3c == "ENG" ~ "High income",
+           iso3c == "WAL" ~ "High income",
+           iso3c == "SCO" ~ "High income",
+           iso3c == "NIR" ~ "High income",
+           TRUE ~ incgroup
+         ),
+         wbregion = case_when(
+           iso3c == "ENG" ~ "Europe & Central Asia",
+           iso3c == "WAL" ~ "Europe & Central Asia",
+           iso3c == "SCO" ~ "Europe & Central Asia",
+           iso3c == "NIR" ~ "Europe & Central Asia",
+           TRUE ~ wbregion
+         ),
+         odw_region_name = case_when(
+           iso3c == "ENG" ~ "Northern Europe",
+           iso3c == "WAL" ~ "Northern Europe",
+           iso3c == "SCO" ~ "Northern Europe",
+           iso3c == "NIR" ~ "Northern Europe",
+           TRUE ~ odw_region_name
+         ),
+         lending_cat = case_when(
+           iso3c == "ENG" ~ "..",
+           iso3c == "WAL" ~ "..",
+           iso3c == "SCO" ~ "..",
+           iso3c == "NIR" ~ "..",
+           TRUE ~ lending_cat
+         ))
 
 
 ### ANALYSIS ####
