@@ -32,34 +32,13 @@ get_data_text <- content(get_data, "text")
 get_data_json <- fromJSON(get_data_text, flatten = TRUE)
 
 # Initialize empty dataframe
-df <- data.frame()
+covid_deaths_cases_raw <- data.frame()
 for (i in 1:length(get_data_json$data)){
   country_df <- as.data.frame(get_data_json$data[i], col.names = "GH5050")
-  df <- df %>%
+  covid_deaths_cases_raw <- covid_deaths_cases_raw %>%
     bind_rows(country_df)
 }
-# Clean up
-df_clean <- df %>%
-  # Make column names nice by removing GH5050 slug
-  rename_with(~str_remove(., "GH5050.")) %>%
-  # clean column types
-  mutate(across(contains("date"), ~lubridate::mdy(.x)),
-         across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
-         across(where(is.factor), as.character),
-         # Add country codes
-         iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
-         iso3c = case_when(
-           # Fix ISO codes from import
-           country_code == "SAO" ~ "STP",
-           country_code == "SEY" ~ "SYC",
-           # Add country codes for nations of UK for easier merging
-           country == "England" ~ "ENG",
-           country == "Wales" ~ "WAL",
-           country == "Scotland" ~ "SCO",
-           country == "Northern Ireland" ~ "NIR",
-           country == "England Wales and Northern Ireland" ~ "EWN",
-           TRUE ~ iso3c
-         ))
+
 
 # Import historical Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
 # For historical analysis
@@ -85,28 +64,28 @@ gh5050_historical <- df %>%
          across(where(is.factor), as.character),
          iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"))
 
-# Import static csv to check against API call (don't need to do this every time)
-covid_deaths_cases_raw <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day, ".csv"), na = "") %>%
-  janitor::clean_names() %>%
-  mutate(iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
-         iso3c = case_when(
-           # Fix ISO codes from import
-           country_code == "SAO" ~ "STP",
-           country_code == "SEY" ~ "SYC",
-           # Add country codes for nations of UK for easier merging
-           country == "England" ~ "ENG",
-           country == "Wales" ~ "WAL",
-           country == "Scotland" ~ "SCO",
-           country == "Northern Ireland" ~ "NIR",
-           country == "England Wales and Northern Ireland" ~ "EWN",
-           TRUE ~ iso3c
-         ),
-         # Clean date formats
-         across(contains("date"), ~lubridate::dmy(.x)),
-         # Clean rates of cases and deaths
-         across(contains("percent"), ~as.numeric(str_remove(.x, "%"))/100)) %>%
-  rename(cases_total_sum = cases_where_sex_disaggregated_data_is_available,
-         deaths_total_sum = deaths_where_sex_disaggregated_data_is_available)
+## Import static csv to check against API call (don't need to do this every time)
+#covid_deaths_cases_static <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day, ".csv"), na = "") %>%
+#  janitor::clean_names() %>%
+#  mutate(iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+#         iso3c = case_when(
+#           # Fix ISO codes from import
+#           country_code == "SAO" ~ "STP",
+#           country_code == "SEY" ~ "SYC",
+#           # Add country codes for nations of UK for easier merging
+#           country == "England" ~ "ENG",
+#           country == "Wales" ~ "WAL",
+#           country == "Scotland" ~ "SCO",
+#           country == "Northern Ireland" ~ "NIR",
+#           country == "England Wales and Northern Ireland" ~ "EWN",
+#           TRUE ~ iso3c
+#         ),
+#         # Clean date formats
+#         across(contains("date"), ~lubridate::dmy(.x)),
+#         # Clean rates of cases and deaths
+#         across(contains("percent"), ~as.numeric(str_remove(.x, "%"))/100)) %>%
+#  rename(cases_total_sum = cases_where_sex_disaggregated_data_is_available,
+#         deaths_total_sum = deaths_where_sex_disaggregated_data_is_available)
 
 
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
@@ -199,23 +178,45 @@ world_pop_female <- world_pop %>% pull(pop_female)
 ### ADDITIONAL PROCESSING ####
 
 # Creating master dataset out of GH5050 datasets
-covid_deaths_cases <- df_clean %>%
+covid_deaths_cases <- covid_deaths_cases_raw %>%
+  # Clean variable names
+  rename_with(~str_remove(., "GH5050.")) %>%
   # Additional clean and add relevant indicators
   mutate(
-  # Add source name
-  source_name = "Global Health 50/50",
-  # Create own sex-disaggregated status variable to reflect differences in reporting cases and deaths
-  # New Gh5050 makes Both equal "country has ever reported data on both cases and deaths at the same time point."
-  # For our purposes, not important for the moment, so go with whether
-  # Sex-disaggregated data is available for both cases and deaths manually.
-  # Use cases_date and deaths_date for this, since if cases or deaths are 0,
-  # even though they're disaggregated, the columns for percent_male will be NA, rather than 0.
-  disaggregated_status = case_when(
+    # Convert date columns to date format
+    across(contains("date"), ~lubridate::mdy(.x)),
+    # Convert columns with numeric info to numeric (currently in factor, need to convert to character, then numeric)
+    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
+    # Convert remaining factor variables to character variables
+    across(where(is.factor), as.character),
+    # Add country codes
+    iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+    iso3c = case_when(
+      # Fix ISO codes from import
+      country_code == "SAO" ~ "STP",
+      country_code == "SEY" ~ "SYC",
+      # Add country codes for nations of UK for easier merging
+      country == "England" ~ "ENG",
+      country == "Wales" ~ "WAL",
+      country == "Scotland" ~ "SCO",
+      country == "Northern Ireland" ~ "NIR",
+      country == "England Wales and Northern Ireland" ~ "EWN",
+      TRUE ~ iso3c
+    ),
+    # Add source name
+    source_name = "Global Health 50/50",
+    # Create own sex-disaggregated status variable to reflect differences in reporting cases and deaths
+    # New Gh5050 makes Both equal "country has ever reported data on both cases and deaths at the same time point."
+    # For our purposes, not important for the moment, so go with whether
+    # Sex-disaggregated data is available for both cases and deaths manually.
+    # Use cases_date and deaths_date for this, since if cases or deaths are 0,
+    # even though they're disaggregated, the columns for percent_male will be NA, rather than 0.
+    disaggregated_status = case_when(
     !is.na(date_cases) & !is.na(date_deaths) ~ "Both",
     !is.na(date_cases) & is.na(date_deaths) ~ "Cases only",
     is.na(date_cases) & !is.na(date_deaths) ~ "Deaths only",
     TRUE ~ "None"
-  )) %>%
+    )) %>%
   # Drop empty observations
   filter(!is.na(iso3c)) %>%
   # Import population from UN WPP, see above
