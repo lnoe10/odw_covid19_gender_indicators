@@ -7,7 +7,7 @@ library(tidyverse)
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
 month <- "11"
-day <- "16"
+day <- "30"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -86,7 +86,7 @@ for (i in 1:length(get_historical_json$data)){
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
 # appending latest date if Gh5050 date isn't available.
 # Read in latest data from Our World in Data Github raw
-owid_raw <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 10000)
+owid_raw <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 20000)
 owid <- owid_raw %>% 
   # Keep observations for latest Gh5050 update to line up
   filter(date == str_c("2020-", month, "-", day)) %>% 
