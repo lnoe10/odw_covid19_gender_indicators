@@ -367,7 +367,7 @@ avg_new_cases %>%
   scale_x_continuous(breaks = c(3, 4, 5, 6, 7, 8, 9, 10, 11),
                      labels = c(3, 4, 5, 6, 7, 8, 9, 10, 11)) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
-  labs(x = "Month of 2020", y = "Share of cases",
+  labs(x = "Month of 2020", y = "Share of global cases",
        title = "Cases",
        caption = "Source: GH5050, ODW calculations",
        fill = "Sex-disaggregated?") +
@@ -396,7 +396,7 @@ avg_new_cases %>%
   scale_x_continuous(breaks = c(3, 4, 5, 6, 7, 8, 9, 10, 11),
                      labels = c(3, 4, 5, 6, 7, 8, 9, 10, 11)) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
-  labs(x = "Month of 2020", y = "Share of deaths",
+  labs(x = "Month of 2020", y = "Share of global deaths",
        title = "Deaths",
        caption = "Source: GH5050, ODW calculations",
        fill = "Sex-disaggregated?") +
