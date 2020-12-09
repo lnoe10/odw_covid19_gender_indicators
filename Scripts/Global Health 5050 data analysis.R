@@ -376,13 +376,13 @@ avg_new_cases %>%
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
   labs(x = "Month of 2020", y = "Share of new global cases\nShare of countries",
        title = "Sex-disaggregated reporting of COVID-19 cases", subtitle = "Black line: Share of countries in Our World in Data (OWID) that also report sex-disaggregated data",
-       caption = "Source: Global Health 50/50 30 Nov 2020 data release; Our World in Data 'Coronavirus Pandemic (COVID-19)'; Open Data Watch (ODW) calculations",
+       caption = "Source: Global Health 50/50 30 Nov 2020 data release; OWID 'Coronavirus Pandemic (COVID-19)'; Open Data Watch (ODW) calculations",
        fill = "Sex-disaggregated?") +
   scale_fill_manual(values = c("#d24d57", "#2abb9b")) +
   theme(panel.background = element_blank(), panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(linetype = "dotted", size=.1, color="gray" ), axis.line = element_line(colour = "black"),
-        plot.subtitle = element_text(size = 9),
-        plot.caption = element_text(hjust = 0.2, size = 7))
+        plot.subtitle = element_text(size = 10),
+        plot.caption = element_text(hjust = 0.2, size = 7.5))
 ggsave("Output/Share of cases disaggregated by sex.png", dpi = 600)
 
 
@@ -415,13 +415,13 @@ avg_new_cases %>%
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
   labs(x = "Month of 2020", y = "Share of new global deaths\nShare of countries",
        title = "Sex-disaggregated reporting of COVID-19 deaths", subtitle = "Black line: Share of countries in Our World in Data (OWID) that also report sex-disaggregated data",
-       caption = "Source: Global Health 50/50 30 Nov 2020 data release; Our World in Data 'Coronavirus Pandemic (COVID-19)'; Open Data Watch (ODW) calculations",
+       caption = "Source: Global Health 50/50 30 Nov 2020 data release; OWID 'Coronavirus Pandemic (COVID-19)'; Open Data Watch (ODW) calculations",
        fill = "Sex-disaggregated?") +
   scale_fill_manual(values = c("#d24d57", "#2abb9b")) +
   theme(panel.background = element_blank(), panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(linetype = "dotted", size=.1, color="gray" ), axis.line = element_line(colour = "black"),
-        plot.subtitle = element_text(size = 9),
-        plot.caption = element_text(hjust = 0.2, size = 7))
+        plot.subtitle = element_text(size = 10),
+        plot.caption = element_text(hjust = 0.2, size = 7.5))
 ggsave("Output/Share of deaths disaggregated by sex.png", dpi = 600)
 
 ###
