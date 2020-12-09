@@ -361,28 +361,35 @@ avg_new_cases %>%
     sdd == "share_NA" ~ "No",
     TRUE ~ "Yes"
   )) %>%
+  rename(`Sex-disaggregated?` = sdd) %>%
   filter(month >= 3) %>%
   ggplot() +
-  geom_col(aes(x = month, y = share*100, fill = sdd)) +
+  geom_col(aes(x = month, y = share*100, fill = `Sex-disaggregated?`)) +
   geom_line(data = avg_new_cases %>% 
               group_by(month) %>% 
               summarize(num_countries_deaths = sum(sex_disaggregated_deaths, na.rm = TRUE), 
                         num_countries_cases = sum(sex_disaggregated_cases, na.rm = TRUE)) %>% 
               ungroup() %>%
               filter(!month %in% c(1, 2, 12)),
-            aes(x = month, y = num_countries_cases/191*100)) +
+            aes(x = month, y = num_countries_cases/191*100, color = "Share of countries\nthat also report sex\ndisaggregated data")) +
   scale_x_continuous(breaks = c(3, 4, 5, 6, 7, 8, 9, 10, 11),
                      labels = c(3, 4, 5, 6, 7, 8, 9, 10, 11)) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
   labs(x = "Month of 2020", y = "Share of new global cases\nShare of countries",
-       title = "Sex-disaggregated reporting of COVID-19 cases", subtitle = "Black line: Share of countries in Our World in Data (OWID) that also report sex-disaggregated data",
-       caption = "Source: Global Health 50/50 30 Nov 2020 data release; OWID 'Coronavirus Pandemic (COVID-19)'; Open Data Watch (ODW) calculations",
-       fill = "Sex-disaggregated?") +
+       title = "Sex-disaggregated reporting of COVID-19 cases (191 countries)", 
+       caption = "Source: Global Health 50/50 30 Nov 2020 data release; Our World in Data 'Coronavirus' page; Open Data Watch (ODW) calculations") +
   scale_fill_manual(values = c("#d24d57", "#2abb9b")) +
+  scale_color_manual(values = c("black")) +
   theme(panel.background = element_blank(), panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(linetype = "dotted", size=.1, color="gray" ), axis.line = element_line(colour = "black"),
         plot.subtitle = element_text(size = 10),
-        plot.caption = element_text(hjust = 0.2, size = 7.5))
+        plot.caption = element_text(hjust = 0.2, size = 7.5),
+        legend.key=element_blank()) +
+  guides(
+    color = guide_legend(order = 0, title = ""),
+    fill = guide_legend(order = 1)
+  )
+
 ggsave("Output/Share of cases disaggregated by sex.png", dpi = 600)
 
 
