@@ -362,13 +362,20 @@ avg_new_cases %>%
     TRUE ~ "Yes"
   )) %>%
   filter(month >= 3) %>%
-  ggplot(aes(x = month, y = share*100, fill = sdd)) +
-  geom_col() +
+  ggplot() +
+  geom_col(aes(x = month, y = share*100, fill = sdd)) +
+  geom_line(data = avg_new_cases %>% 
+              group_by(month) %>% 
+              summarize(num_countries_deaths = sum(sex_disaggregated_deaths, na.rm = TRUE), 
+                        num_countries_cases = sum(sex_disaggregated_cases, na.rm = TRUE)) %>% 
+              ungroup() %>%
+              filter(!month %in% c(1, 2, 12)),
+            aes(x = month, y = num_countries_cases/191*100)) +
   scale_x_continuous(breaks = c(3, 4, 5, 6, 7, 8, 9, 10, 11),
                      labels = c(3, 4, 5, 6, 7, 8, 9, 10, 11)) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
-  labs(x = "Month of 2020", y = "Share of new global cases",
-       title = "Cases",
+  labs(x = "Month of 2020", y = "Share of new global cases/share of countries",
+       title = "Cases", subtitle = "Black line represents the share of countries in OWID that also report sex-disaggregated data",
        caption = "Source: GH5050, ODW calculations",
        fill = "Sex-disaggregated?") +
   theme(panel.background = element_blank(), panel.grid.major.x = element_blank(),
@@ -391,13 +398,20 @@ avg_new_cases %>%
     TRUE ~ "Yes"
   )) %>%
   filter(month >= 3) %>%
-  ggplot(aes(x = month, y = share*100, fill = sdd)) +
-  geom_col() +
+  ggplot() +
+  geom_col(aes(x = month, y = share*100, fill = sdd)) +
+  geom_line(data = avg_new_cases %>% 
+              group_by(month) %>% 
+              summarize(num_countries_deaths = sum(sex_disaggregated_deaths, na.rm = TRUE), 
+                        num_countries_cases = sum(sex_disaggregated_cases, na.rm = TRUE)) %>% 
+              ungroup() %>%
+              filter(!month %in% c(1, 2, 12)),
+            aes(x = month, y = num_countries_deaths/191*100)) +
   scale_x_continuous(breaks = c(3, 4, 5, 6, 7, 8, 9, 10, 11),
                      labels = c(3, 4, 5, 6, 7, 8, 9, 10, 11)) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
-  labs(x = "Month of 2020", y = "Share of new global deaths",
-       title = "Deaths",
+  labs(x = "Month of 2020", y = "Share of new global deaths/share of countries",
+       title = "Deaths", subtitle = "Black line represents the share of countries in OWID that also report sex-disaggregated data",
        caption = "Source: GH5050, ODW calculations",
        fill = "Sex-disaggregated?") +
   theme(panel.background = element_blank(), panel.grid.major.x = element_blank(),
