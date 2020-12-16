@@ -371,7 +371,7 @@ avg_new_cases %>%
                         num_countries_cases = sum(sex_disaggregated_cases, na.rm = TRUE)) %>% 
               ungroup() %>%
               filter(!month %in% c(1, 2, 12)),
-            aes(x = month, y = num_countries_cases/191*100, color = "Proportion of\ncountries reporting\nsex-disaggregated data")) +
+            aes(x = month, y = num_countries_cases/190*100, color = "Proportion of\ncountries reporting\nsex-disaggregated data")) +
   scale_x_continuous(breaks = c(3, 4, 5, 6, 7, 8, 9, 10, 11),
                      labels = c(3, 4, 5, 6, 7, 8, 9, 10, 11)) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .05))) +
