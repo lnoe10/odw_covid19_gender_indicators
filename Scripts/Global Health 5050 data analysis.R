@@ -375,7 +375,7 @@ avg_new_cases %>%
   scale_x_continuous(breaks = c(3, 4, 5, 6, 7, 8, 9, 10, 11),
                      labels = c(3, 4, 5, 6, 7, 8, 9, 10, 11)) +
   scale_y_continuous(expand = expand_scale(mult = c(0, .1))) +
-  labs(x = "Month of 2020", y = "Proportion of new global cases\nProportion of countries",
+  labs(x = "Month of 2020", y = "Percent",
        title = "Sex-disaggregated reporting of COVID-19 cases (191 countries)", 
        caption = "Source: Global Health 50/50 30 Nov 2020 data release; Our World in Data 'Coronavirus' page; Open Data Watch (ODW) calculations") +
   scale_fill_manual(values = c("#d24d57", "#2abb9b")) +
