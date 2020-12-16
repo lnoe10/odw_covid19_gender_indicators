@@ -312,7 +312,10 @@ gh5050_historical <- gh5050_historical_raw %>%
            iso3c == "NIR" ~ "..",
            TRUE ~ lending_cat
          ))
-
+# Save December 15 vintage of GH5050 data to refer to if we need to replicate exactly.
+# Use in WDR graph below. Note this freezes GH5050 historical as of December 15
+# when the last update of the GH5050 dataset was 30 November.
+# saveRDS(gh5050_historical, file = "Input/GH5050 historical Dec 15.rds")
 
 ### ANALYSIS ####
 
@@ -321,6 +324,8 @@ gh5050_historical <- gh5050_historical_raw %>%
 
 # Read in stable OWID file from Dec 15
 wdr_graph_owid <- readRDS(file = "Input/Our World in Data Dec 15.rds")
+# Read in stable GH5050 file from Dec 15
+wdr_graph_gh5050 <- readRDS(file = "Input/GH5050 historical Dec 15.rds")
 avg_new_cases <- wdr_graph_owid %>%
   # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
   filter(!location %in% c("World", "International")) %>%
@@ -338,14 +343,14 @@ avg_new_cases <- wdr_graph_owid %>%
             mean_new_deaths = mean(new_deaths, na.rm = TRUE)) %>%
   ungroup() %>%
   # Sex-disaggregated cases yes/no
-  left_join(gh5050_historical %>%
+  left_join(wdr_graph_gh5050 %>%
               as_tibble() %>%
               mutate(month = lubridate::month(date_cases)) %>%
               filter(!is.na(month)) %>%
               distinct(iso3c, month) %>%
               mutate(sex_disaggregated_cases = 1)) %>%
   # Sex-disaggregated deaths yes/no
-  left_join(gh5050_historical %>%
+  left_join(wdr_graph_gh5050 %>%
               as_tibble() %>%
               mutate(month = lubridate::month(date_deaths)) %>%
               filter(!is.na(month)) %>%
