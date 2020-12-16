@@ -87,6 +87,9 @@ for (i in 1:length(get_historical_json$data)){
 # appending latest date if Gh5050 date isn't available.
 # Read in latest data from Our World in Data Github raw
 owid_raw <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 20000)
+# Save December 15 vintage of OWID data to refer to if we need to replicate exactly.
+# Use in WDR graph below.
+# saveRDS(owid_raw, file = "Input/Our World in Data Dec 15.rds")
 owid <- owid_raw %>% 
   # Keep observations for latest Gh5050 update to line up
   filter(date == str_c("2020-", month, "-", day)) %>% 
@@ -316,7 +319,9 @@ gh5050_historical <- gh5050_historical_raw %>%
 # Looking at average monthly new cases per month and use gh5050_historical
 # to see if they're sex-disaggregated
 
-avg_new_cases <- owid_raw %>%
+# Read in stable OWID file from Dec 15
+wdr_graph_owid <- readRDS(file = "Input/Our World in Data Dec 15.rds")
+avg_new_cases <- wdr_graph_owid %>%
   # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
   filter(!location %in% c("World", "International")) %>%
   # Clean country name variables
