@@ -87,9 +87,10 @@ for (i in 1:length(get_historical_json$data)){
 # appending latest date if Gh5050 date isn't available.
 # Read in latest data from Our World in Data Github raw
 owid_raw <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 20000)
-# Save December 15 vintage of OWID data to refer to if we need to replicate exactly.
-# Use in WDR graph below.
+# Below (commented) command preserved December 15 vintage of OWID data to 
+# refer to in WDR graph if we need to replicate exactly.
 # saveRDS(owid_raw, file = "Input/Our World in Data Dec 15.rds")
+
 owid <- owid_raw %>% 
   # Keep observations for latest Gh5050 update to line up
   filter(date == str_c("2021-", month, "-", day)) %>% 
@@ -312,8 +313,9 @@ gh5050_historical <- gh5050_historical_raw %>%
            iso3c == "NIR" ~ "..",
            TRUE ~ lending_cat
          ))
-# Save December 15 vintage of GH5050 data to refer to if we need to replicate exactly.
-# Use in WDR graph below. Note this freezes GH5050 historical as of December 15
+# Below (commented) command saved December 15 vintage of GH5050 data to refer to 
+# in WDR graph to ensure fidelity to data at time of download.
+# Note this freezes GH5050 historical as of December 15
 # when the last update of the GH5050 dataset was 30 November.
 # saveRDS(gh5050_historical, file = "Input/GH5050 historical Dec 15.rds")
 
