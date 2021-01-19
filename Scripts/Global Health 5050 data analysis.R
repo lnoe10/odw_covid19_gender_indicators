@@ -6,8 +6,8 @@ library(tidyverse)
 
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
-month <- "11"
-day <- "30"
+month <- "01"
+day <- "11"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -92,7 +92,7 @@ owid_raw <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/maste
 # saveRDS(owid_raw, file = "Input/Our World in Data Dec 15.rds")
 owid <- owid_raw %>% 
   # Keep observations for latest Gh5050 update to line up
-  filter(date == str_c("2020-", month, "-", day)) %>% 
+  filter(date == str_c("2021-", month, "-", day)) %>% 
   # In cases where Gh5050 date is not available (some countries take
   # longer to report, or stopped reporting), append latest date
   # of all countries
