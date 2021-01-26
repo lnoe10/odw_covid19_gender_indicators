@@ -7,7 +7,7 @@ library(tidyverse)
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
 month <- "01"
-day <- "11"
+day <- "25"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
