@@ -59,30 +59,6 @@ for (i in 1:length(get_historical_json$data)){
     bind_rows(country_df)
 }
 
-## Import static csv to check against API call (don't need to do this every time)
-#covid_deaths_cases_static <- read_csv(str_c("Input/GH5050 Covid-19 sex-disaggregated data tracker ", month, day, ".csv"), na = "") %>%
-#  janitor::clean_names() %>%
-#  mutate(iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
-#         iso3c = case_when(
-#           # Fix ISO codes from import
-#           country_code == "SAO" ~ "STP",
-#           country_code == "SEY" ~ "SYC",
-#           # Add country codes for nations of UK for easier merging
-#           country == "England" ~ "ENG",
-#           country == "Wales" ~ "WAL",
-#           country == "Scotland" ~ "SCO",
-#           country == "Northern Ireland" ~ "NIR",
-#           country == "England Wales and Northern Ireland" ~ "EWN",
-#           TRUE ~ iso3c
-#         ),
-#         # Clean date formats
-#         across(contains("date"), ~lubridate::dmy(.x)),
-#         # Clean rates of cases and deaths
-#         across(contains("percent"), ~as.numeric(str_remove(.x, "%"))/100)) %>%
-#  rename(cases_total_sum = cases_where_sex_disaggregated_data_is_available,
-#         deaths_total_sum = deaths_where_sex_disaggregated_data_is_available)
-
-
 # Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
 # appending latest date if Gh5050 date isn't available.
 # Read in latest data from Our World in Data Github raw
