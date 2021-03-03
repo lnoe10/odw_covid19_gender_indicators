@@ -6,8 +6,8 @@ library(tidyverse)
 
 # Set date variables to toggle between versions of data to import.
 # Using 2 digit month, 2 digit day format
-month <- "01"
-day <- "25"
+month <- "02"
+day <- "22"
 
 # Import ODW master codes for merging and country groups
 odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
@@ -161,7 +161,7 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
     # Convert date columns to date format
     across(contains("date"), ~lubridate::mdy(.x)),
     # Convert columns with numeric info to numeric (currently in factor, need to convert to character, then numeric)
-    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
+    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female", "vac")), ~as.numeric(as.character(.x))),
     # Convert remaining factor variables to character variables
     across(where(is.factor), as.character),
     # Add country codes
@@ -170,6 +170,7 @@ covid_deaths_cases <- covid_deaths_cases_raw %>%
       # Fix ISO codes from import
       country_code == "SAO" ~ "STP",
       country_code == "SEY" ~ "SYC",
+      country_code == "XK" ~ "XKX",
       # Add country codes for nations of UK for easier merging
       country == "England" ~ "ENG",
       country == "Wales" ~ "WAL",
@@ -236,7 +237,7 @@ gh5050_historical <- gh5050_historical_raw %>%
     # Convert date columns to date format
     across(contains("date"), ~lubridate::mdy(.x)),
     # Convert columns with numeric info to numeric (currently in factor, need to convert to character, then numeric)
-    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female")), ~as.numeric(as.character(.x))),
+    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female", "vac")), ~as.numeric(as.character(.x))),
     # Convert remaining factor variables to character variables
     across(where(is.factor), as.character),
     # Add country codes
@@ -245,6 +246,7 @@ gh5050_historical <- gh5050_historical_raw %>%
       # Fix ISO codes from import
       country_code == "SAO" ~ "STP",
       country_code == "SEY" ~ "SYC",
+      country_code == "XK" ~ "XKX",
       # Add country codes for nations of UK for easier merging
       country == "England" ~ "ENG",
       country == "Wales" ~ "WAL",
