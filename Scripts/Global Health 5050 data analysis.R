@@ -397,29 +397,24 @@ gh5050_historical <- gh5050_historical_raw %>%
 
 # Covid cases male and female shares by groups
 covid_table_groups <- covid_deaths_cases %>% 
-  # Create absolute number of cases and deaths
-  mutate(num_cases_male = cases_percent_male/100*total_cases, 
-         num_cases_female = cases_percent_female/100*total_cases,
-         num_deaths_male = deaths_percent_male/100*total_deaths, 
-         num_deaths_female = deaths_percent_female/100*total_deaths) %>% 
   # Collapse to sum number of cases/deaths and sex-disaggregated cases/deaths
   # By group
   # Also create aggregate for population and count how many countries in each group
   group_by(disaggregated_status) %>% 
-  summarize(num_cases = sum(total_cases, na.rm = TRUE), 
-            cases_male = sum(num_cases_male, na.rm = TRUE), 
-            cases_female = sum(num_cases_female, na.rm = TRUE),
-            num_deaths = sum(total_deaths, na.rm = TRUE), 
-            deaths_male = sum(num_deaths_male, na.rm = TRUE), 
-            deaths_female = sum(num_deaths_female, na.rm = TRUE),
-            sum_pop = sum(pop_total, na.rm = TRUE),
+  summarize(num_cases = sum(cases_total_sum, na.rm = TRUE), 
+            total_cases_male = sum(cases_male, na.rm = TRUE), 
+            total_cases_female = sum(cases_female, na.rm = TRUE),
+            num_deaths = sum(deaths_total_sum, na.rm = TRUE), 
+            total_deaths_male = sum(deaths_male, na.rm = TRUE), 
+            total_deaths_female = sum(deaths_female, na.rm = TRUE),
+            sum_pop = sum(totpop2020*1000, na.rm = TRUE),
             countries = n_distinct(iso3c)) %>% 
   ungroup() %>% 
   # Create shares of sex-disaggregated cases/deaths and share of population
-  mutate(pct_male_c = cases_male/num_cases, 
-         pct_fem_c = cases_female/num_cases,
-         pct_male_d = deaths_male/num_deaths, 
-         pct_fem_d = deaths_female/num_deaths,
+  mutate(pct_male_c = total_cases_male/num_cases, 
+         pct_fem_c = total_cases_female/num_cases,
+         pct_male_d = total_deaths_male/num_deaths, 
+         pct_fem_d = total_deaths_female/num_deaths,
          share_pop = sum_pop/world_pop_total) %>%
   filter(disaggregated_status != "None") %>%
   select(disaggregated_status, countries, num_cases, pct_male_c, pct_fem_c,
@@ -453,11 +448,13 @@ covid_table_groups <- covid_deaths_cases %>%
 
 
 ### Table 2
+#### This drops French Polynesia because OWID does not have data on that island
+#### How to address not quite independent countries? Including Jersey, for example
 
 # Merge OWID data with list of GH5050 countries and their sex-disaggregation status
 owid_working <- owid %>%
-  # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
-  filter(!country.x %in% c("World", "International")) %>%
+  # Take out World aggregate, regional aggregates, "International", which is no longer used (was for cruise ships, etc.)
+  filter(!str_detect(iso3c, "OWID")) %>%
   # Clean country name variables
   select(-country.y) %>%
   rename(country = country.x) %>%
