@@ -13,8 +13,301 @@ knitr::opts_chunk$set(echo = TRUE)
 
 In this blog, we summarize the existing data on sex-disaggregated COVID-19 cases and deaths from [Global Health 50/50](https://globalhealth5050.org/the-sex-gender-and-covid-19-project/the-data-tracker/) and ask how complete our picture is when compared to all reported cases and deaths. In addition, we examine the shares of COVID-19 cases and deaths that are sex-disaggregated by income and region.
 
-```{r cars}
-summary(cars)
+```{r import_data, echo=FALSE, warning=FALSE, message=FALSE}
+library(httr)
+library(jsonlite)
+library(tidyverse)
+
+### IMPORT RAW DATA ####
+
+# Set date variables to toggle between versions of data to import.
+# Using 2 digit month, 2 digit day format
+month <- "03"
+day <- "10"
+
+# Import ODW master codes for merging and country groups
+odw_master_codes <- read_csv("Input/2021 ODW Country and Region Codes.csv") %>%
+  # Clean all variable names by converting to snake case
+  janitor::clean_names() %>% 
+  # Clear out extra lines at the bottom that just contain notes
+  filter(!is.na(country_name)) %>%
+  # Clear out duplicate Faroe Islands
+  distinct(iso_3_code, .keep_all = TRUE) %>%
+  # Keep only relevant indicators and rename for clarity 
+  select(iso3c = iso_3_code, country = country_name, odw_region_name, un_code = un_m49_code,
+         incgroup = world_bank_income_group_name, lending_cat = world_bank_lending_code_july_2020,
+         wbregion = world_bank_all_income_region_names) %>%
+  mutate(un_code = as.numeric(un_code), 
+         incgroup = fct_relevel(incgroup, "Low income", "Lower middle income", "Upper middle income", "High income"))
+
+# Import Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
+# See documentation here: https://api.globalhealth5050.org/docs/
+# Get
+get_data <- GET("https://api.globalhealth5050.org/api/v1/summary?data=fullvars")
+get_data_text <- content(get_data, "text")
+get_data_json <- fromJSON(get_data_text, flatten = TRUE)
+
+# Initialize empty dataframe
+covid_deaths_cases_raw <- data.frame()
+# Run loop through JSON list to extract line of data for every country
+# and append to empty dataframe
+for (i in 1:length(get_data_json$data)){
+  country_df <- as.data.frame(get_data_json$data[i], col.names = "GH5050")
+  covid_deaths_cases_raw <- covid_deaths_cases_raw %>%
+    bind_rows(country_df)
+}
+
+
+# Import historical Global health 50/50 Sex-disaggregated data tracker file and clean up variable names
+# For historical analysis
+# Get
+get_historical <- GET("https://api.globalhealth5050.org/api/v1/summary?data=historic")
+get_historical_text <- content(get_historical, "text")
+get_historical_json <- fromJSON(get_historical_text, flatten = TRUE)
+
+# Initialize empty dataframe
+gh5050_historical_raw <- data.frame()
+# Run loop through JSON list to extract line of data for every country
+# and append to empty dataframe
+for (i in 1:length(get_historical_json$data)){
+  country_df <- as.data.frame(get_historical_json$data[i], col.names = "GH5050")
+  gh5050_historical_raw <- gh5050_historical_raw %>%
+    bind_rows(country_df)
+}
+
+# Import Our World In Data Coronavirus data and clean, keeping date of GH5050 update or
+# appending latest date if Gh5050 date isn't available.
+# Read in latest data from Our World in Data Github raw
+owid_raw <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", guess_max = 20000)
+# Below (commented) command preserved December 15 vintage of OWID data to 
+# refer to in WDR graph if we need to replicate exactly.
+# saveRDS(owid_raw, file = "Input/Our World in Data Dec 15.rds")
+
+owid <- owid_raw %>% 
+  # Keep observations for latest Gh5050 update to line up
+  filter(date == str_c("2021-", month, "-", day)) %>% 
+  # In cases where Gh5050 date is not available (some countries take
+  # longer to report, or stopped reporting), append latest date
+  # of all countries
+  bind_rows(owid_raw %>% 
+              group_by(iso_code) %>% 
+              mutate(obs_num = row_number()) %>% 
+              filter(obs_num == max(obs_num, na.rm = TRUE)) %>% 
+              ungroup() %>%
+              select(-obs_num)) %>% 
+  # Then keep distinct (in this case first) observation by iso3 code 
+  # and country name. Will keep Gh5050 update day for countries that 
+  # have it and will keep latest update for countries that don't
+  # As of October 23, 213 location available, that should be number of obs
+  # in dataset
+  distinct(iso_code, location, .keep_all = TRUE) %>%
+  # Keep only variables we want
+  select(iso3c = iso_code, country = location, date, total_cases, total_deaths) %>%
+  # replace iso3 value for Kosovo with version that World Bank uses for merging.
+  mutate(iso3c = case_when(
+    country == "Kosovo" ~ "XKX",
+    TRUE ~ iso3c
+  )) %>%
+  # Add country grouping info
+  left_join(odw_master_codes, by = c("iso3c"))
+
+# This can now be accessed via API as well.
+# # Import countries that have sex AND age disaggregation for cases and deaths
+# # Also from Global Health 5050
+# covid_age_sex <- read_csv("Input/gh_sex_age_Jul24.csv") %>%
+#   filter(country != "Scotland") %>%
+#   mutate(
+#     country = case_when(
+#       country == "England" ~ "United Kingdom",
+#       TRUE ~ country
+#     ),
+#     iso3c = countrycode::countrycode(country, "country.name", "iso3c"))
+
+# Import 2019 Population from UN World Population prospects 2019
+# This is a filtered CSV of the "Total Population", "All variants" file
+# found here https://population.un.org/wpp/Download/Standard/CSV/
+# This is filtered for year (2019), as well as Variant (Medium)
+pop_2019 <- read_csv("Input/WPP2019_TotalPopulationBySex.csv") %>%
+  janitor::clean_names() %>%
+  # UN uses iso3 numeric country identifiers. Because we use iso3 character everywhere else,
+  # merge in ISO country name list, numeric, and character code from
+  # https://www.iso.org/obp/ui/#search click on country codes and search
+  # merging in with inner_join also keeps only those entities that are actual
+  # countries, since ISO list does not contain aggregates unlike UN WPP
+  inner_join(read_csv("Input/iso_name_char_code.csv") %>%
+               janitor::clean_names(), by = c("loc_id" = "numeric")) %>%
+  # Select only relevant variables
+  select(iso_num = loc_id, country = location, pop_male:pop_total, iso3c = alpha_3_code) %>%
+  # Because GH 5050 reports constitutent countries from UK separately, create sub-components for
+  # England, Wales, Northern Ireland, Scotland, using ONS data from
+  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2019estimates
+  # Figure 3 population pyramid has 2019 population estimates and
+  # sex breakdown.
+  add_row(country = c("England", "Wales", "Scotland", "Northern Ireland"),
+          iso3c = c("ENG", "WAL", "SCO", "NIR"),
+          pop_total = c(56286.961, 3152.879, 5463.300, 1893.667),
+          pop_male = c(27827.831, 1554.678, 2663.003, 932.717),
+          pop_female = c(28459.130, 1598.201, 2800.297, 960.950)) %>%
+  mutate(
+  # Convert all population estimates from thousands
+  pop_male = pop_male*1000,
+  pop_female = pop_female*1000,
+  pop_total = pop_total*1000) %>%
+  # filter out UK
+  filter(iso3c != "GBR")
+
+# Create variables that hold total world population
+world_pop <- read_csv("Input/WPP2019_TotalPopulationBySex.csv") %>%
+  janitor::clean_names() %>%
+  filter(location == "World") %>%
+  mutate(pop_total = pop_total*1000, pop_male = pop_male*1000, pop_female = pop_female*1000)
+
+world_pop_total <- world_pop %>% pull(pop_total)
+world_pop_male <- world_pop %>% pull(pop_male)
+world_pop_female <- world_pop %>% pull(pop_female)
+
+### ADDITIONAL PROCESSING ####
+
+# Creating master dataset out of GH5050 datasets
+covid_deaths_cases <- covid_deaths_cases_raw %>%
+  # Clean variable names
+  rename_with(~str_remove(., "GH5050.")) %>%
+  # Additional clean and add relevant indicators
+  mutate(
+    # Convert date columns to date format
+    across(contains("date"), ~lubridate::mdy(.x)),
+    # Convert columns with numeric info to numeric (currently in factor, need to convert to character, then numeric)
+    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female", "vac")), ~as.numeric(as.character(.x))),
+    # Convert remaining factor variables to character variables
+    across(where(is.factor), as.character),
+    # Add country codes
+    iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+    iso3c = case_when(
+      # Fix ISO codes from import
+      country_code == "SAO" ~ "STP",
+      country_code == "SEY" ~ "SYC",
+      country_code == "XK" ~ "XKX",
+      # Add country codes for nations of UK for easier merging
+      country == "England" ~ "ENG",
+      country == "Wales" ~ "WAL",
+      country == "Scotland" ~ "SCO",
+      country == "Northern Ireland" ~ "NIR",
+      TRUE ~ iso3c
+    ),
+    # Add source name
+    source_name = "Global Health 50/50",
+    # Create own sex-disaggregated status variable to reflect differences in reporting cases and deaths
+    # New Gh5050 makes Both equal "country has ever reported data on both cases and deaths at the same time point."
+    # For our purposes, not important for the moment, so go with whether
+    # Sex-disaggregated data is available for both cases and deaths manually.
+    # Use cases_date and deaths_date for this, since if cases or deaths are 0,
+    # even though they're disaggregated, the columns for percent_male will be NA, rather than 0.
+    disaggregated_status = case_when(
+    !is.na(date_cases) & !is.na(date_deaths) ~ "Both",
+    !is.na(date_cases) & is.na(date_deaths) ~ "Cases only",
+    is.na(date_cases) & !is.na(date_deaths) ~ "Deaths only",
+    TRUE ~ "None"
+    )) %>%
+  # Drop empty observations
+  filter(!is.na(iso3c)) %>%
+  # Import population from UN WPP, see above
+  left_join(pop_2019 %>% select(-c(country))) %>%
+  # Add country groups
+  left_join(odw_master_codes %>% select(-c(country, un_code))) %>%
+  mutate(incgroup = as.character(incgroup),
+  incgroup = case_when(
+    iso3c == "ENG" ~ "High income",
+    iso3c == "WAL" ~ "High income",
+    iso3c == "SCO" ~ "High income",
+    iso3c == "NIR" ~ "High income",
+    TRUE ~ incgroup
+  ),
+  wbregion = case_when(
+    iso3c == "ENG" ~ "Europe & Central Asia",
+    iso3c == "WAL" ~ "Europe & Central Asia",
+    iso3c == "SCO" ~ "Europe & Central Asia",
+    iso3c == "NIR" ~ "Europe & Central Asia",
+    TRUE ~ wbregion
+  ),
+  odw_region_name = case_when(
+    iso3c == "ENG" ~ "Northern Europe",
+    iso3c == "WAL" ~ "Northern Europe",
+    iso3c == "SCO" ~ "Northern Europe",
+    iso3c == "NIR" ~ "Northern Europe",
+    TRUE ~ odw_region_name
+  ),
+  lending_cat = case_when(
+    iso3c == "ENG" ~ "..",
+    iso3c == "WAL" ~ "..",
+    iso3c == "SCO" ~ "..",
+    iso3c == "NIR" ~ "..",
+    TRUE ~ lending_cat
+  ))
+
+# Clean up
+gh5050_historical <- gh5050_historical_raw %>%
+  # Make column names nice by removing GH5050 slug
+  rename_with(~str_remove(., "GH5050.")) %>%
+  # clean column types
+  mutate(
+    # Convert date columns to date format
+    across(contains("date"), ~lubridate::mdy(.x)),
+    # Convert columns with numeric info to numeric (currently in factor, need to convert to character, then numeric)
+    across(starts_with(c("tests", "cases", "deaths", "hosp", "icu", "healthcare", "cfr", "tot", "male", "female", "vac")), ~as.numeric(as.character(.x))),
+    # Convert remaining factor variables to character variables
+    across(where(is.factor), as.character),
+    # Add country codes
+    iso3c = countrycode::countrycode(country_code, "iso2c", "iso3c"),
+    iso3c = case_when(
+      # Fix ISO codes from import
+      country_code == "SAO" ~ "STP",
+      country_code == "SEY" ~ "SYC",
+      country_code == "XK" ~ "XKX",
+      # Add country codes for nations of UK for easier merging
+      country == "England" ~ "ENG",
+      country == "Wales" ~ "WAL",
+      country == "Scotland" ~ "SCO",
+      country == "Northern Ireland" ~ "NIR",
+      # API imports character column country_code NA as NA missing
+      country == "Namibia" ~ "NAM",
+      TRUE ~ iso3c
+    )) %>%
+  # Drop empty observations
+  filter(!is.na(iso3c)) %>%
+  # Import population from UN WPP, see above
+  left_join(pop_2019 %>% select(-c(country))) %>%
+  # Add country groups
+  left_join(odw_master_codes %>% select(-c(country, un_code))) %>%
+  mutate(incgroup = as.character(incgroup),
+         incgroup = case_when(
+           iso3c == "ENG" ~ "High income",
+           iso3c == "WAL" ~ "High income",
+           iso3c == "SCO" ~ "High income",
+           iso3c == "NIR" ~ "High income",
+           TRUE ~ incgroup
+         ),
+         wbregion = case_when(
+           iso3c == "ENG" ~ "Europe & Central Asia",
+           iso3c == "WAL" ~ "Europe & Central Asia",
+           iso3c == "SCO" ~ "Europe & Central Asia",
+           iso3c == "NIR" ~ "Europe & Central Asia",
+           TRUE ~ wbregion
+         ),
+         odw_region_name = case_when(
+           iso3c == "ENG" ~ "Northern Europe",
+           iso3c == "WAL" ~ "Northern Europe",
+           iso3c == "SCO" ~ "Northern Europe",
+           iso3c == "NIR" ~ "Northern Europe",
+           TRUE ~ odw_region_name
+         ),
+         lending_cat = case_when(
+           iso3c == "ENG" ~ "..",
+           iso3c == "WAL" ~ "..",
+           iso3c == "SCO" ~ "..",
+           iso3c == "NIR" ~ "..",
+           TRUE ~ lending_cat
+         ))
+
 ```
 
 ## Including Plots
