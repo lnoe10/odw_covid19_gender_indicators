@@ -310,12 +310,68 @@ gh5050_historical <- gh5050_historical_raw %>%
 
 ```
 
-## Including Plots
+## Table 1
 
-You can also embed plots, for example:
+Table 1 summarizes the sex-disaggregated data available as of `r day` `r months(as.Date(str_c("2021-", month, "-", day)))` 2021. There were 55 countries reporting sex-disaggregated data for COVID-19 cases and deaths. (These include three nations of the United Kingdom – England, Scotland, and Northern Ireland – that are reported separately. Wales reports cases only.) They represent 48 percent of the world’s population (2019 data). 8 countries report sex-disaggregated data for deaths only. Forty-three more countries report sex-disaggregated data on cases but lack data on deaths. In total, four out of five people now live in a country with at least some sex-disaggregated data on COVID-19. For countries reporting sex-disaggregated data on both cases and deaths, women make up 49 percent of cases but only 42 percent of deaths.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Figure out formatting of numbers in table and rename variable names
+
+```{r table_1, echo=FALSE, warning=FALSE, message=FALSE}
+### Table 1
+# Create master table of information for 1. Number of countries that
+# have sex-disaggreation or only 1 of each, 2. Number of cases
+# 3. case split between male and female, 4. Number of deaths, 5. death
+# split between male and female, 6. Share of world population by category
+
+# Covid cases male and female shares by groups
+covid_table_groups <- covid_deaths_cases %>% 
+  # Collapse to sum number of cases/deaths and sex-disaggregated cases/deaths
+  # By group
+  # Also create aggregate for population and count how many countries in each group
+  group_by(disaggregated_status) %>% 
+  summarize(num_cases = sum(cases_total_sum, na.rm = TRUE), 
+            total_cases_male = sum(cases_male, na.rm = TRUE), 
+            total_cases_female = sum(cases_female, na.rm = TRUE),
+            num_deaths = sum(deaths_total_sum, na.rm = TRUE), 
+            total_deaths_male = sum(deaths_male, na.rm = TRUE), 
+            total_deaths_female = sum(deaths_female, na.rm = TRUE),
+            sum_pop = sum(totpop2020*1000, na.rm = TRUE),
+            countries = n_distinct(iso3c)) %>% 
+  ungroup() %>% 
+  # Create shares of sex-disaggregated cases/deaths and share of population
+  mutate(pct_male_c = total_cases_male/num_cases, 
+         pct_fem_c = total_cases_female/num_cases,
+         pct_male_d = total_deaths_male/num_deaths, 
+         pct_fem_d = total_deaths_female/num_deaths,
+         share_pop = sum_pop/world_pop_total) %>%
+  filter(disaggregated_status != "None") %>%
+  select(disaggregated_status, countries, num_cases, pct_male_c, pct_fem_c,
+         num_deaths, pct_male_d, pct_fem_d, share_pop)
+
+### Create table 1
+# Starting with three rows we already have (Both, Cases only, Deaths only)
+covid_table_groups %>%
+      # Append a row made up of sums and weighted averages
+      bind_rows(
+        # This row is made up of 3 segments
+        bind_cols(
+          # A segment of sums: Number of countries with any disaggregation
+          # Total number of cases, deaths, and share of world population
+          covid_table_groups %>%
+            summarize(disaggregated_status = "Total", countries = sum(countries, na.rm = TRUE),
+                      num_cases = sum(num_cases, na.rm = TRUE),
+                      num_deaths = sum(num_deaths, na.rm = TRUE),
+                      share_pop = sum(share_pop, na.rm = TRUE)),
+          # A segment of weighted average male and female case prevalence
+          covid_table_groups %>%
+            filter(!is.nan(pct_male_c)) %>%
+            summarize(pct_male_c = weighted.mean(pct_male_c, num_cases),
+                      pct_fem_c = weighted.mean(pct_fem_c, num_cases)),
+          # A segment of weighted average male and female death prevalence
+          covid_table_groups %>%
+            filter(!is.nan(pct_male_d)) %>%
+            summarize(pct_male_d = weighted.mean(pct_male_d, num_deaths),
+                      pct_fem_d = weighted.mean(pct_fem_d, num_deaths)))) %>%
+  knitr::kable()
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
