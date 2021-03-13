@@ -1,0 +1,28 @@
+---
+title: "Tracking gender data on COVID-19 series"
+author: "Lorenz"
+date: "3/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In this blog, we summarize the existing data on sex-disaggregated COVID-19 cases and deaths from [Global Health 50/50](https://globalhealth5050.org/the-sex-gender-and-covid-19-project/the-data-tracker/) and ask how complete our picture is when compared to all reported cases and deaths. In addition, we examine the shares of COVID-19 cases and deaths that are sex-disaggregated by income and region.
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
