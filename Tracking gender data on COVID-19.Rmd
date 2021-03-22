@@ -310,11 +310,7 @@ gh5050_historical <- gh5050_historical_raw %>%
 
 ```
 
-## Table 1
-
-Table 1 summarizes the sex-disaggregated data available as of `r day` `r months(as.Date(str_c("2021-", month, "-", day)))` 2021. There were 55 countries reporting sex-disaggregated data for COVID-19 cases and deaths. (These include three nations of the United Kingdom – England, Scotland, and Northern Ireland – that are reported separately. Wales reports cases only.) They represent 48 percent of the world’s population (2019 data). 8 countries report sex-disaggregated data for deaths only. Forty-three more countries report sex-disaggregated data on cases but lack data on deaths. In total, four out of five people now live in a country with at least some sex-disaggregated data on COVID-19. For countries reporting sex-disaggregated data on both cases and deaths, women make up 49 percent of cases but only 42 percent of deaths.
-
-Figure out formatting of numbers in table and rename variable names
+## Table 1 Sex-disaggregated data on the COVID-19 pandemic
 
 ```{r table_1, echo=FALSE, warning=FALSE, message=FALSE}
 ### Table 1
@@ -355,8 +351,8 @@ covid_table_groups %>%
       bind_rows(
         # This row is made up of 3 segments
         bind_cols(
-          # A segment of sums: Number of countries with any disaggregation
-          # Total number of cases, deaths, and share of world population
+      # A segment of sums: Number of countries with any disaggregation
+      # Total number of cases, deaths, and share of world population
           covid_table_groups %>%
             summarize(disaggregated_status = "Total", countries = sum(countries, na.rm = TRUE),
                       num_cases = sum(num_cases, na.rm = TRUE),
@@ -365,13 +361,15 @@ covid_table_groups %>%
           # A segment of weighted average male and female case prevalence
           covid_table_groups %>%
             filter(!is.nan(pct_male_c)) %>%
-            summarize(pct_male_c = weighted.mean(pct_male_c, num_cases),
-                      pct_fem_c = weighted.mean(pct_fem_c, num_cases)),
-          # A segment of weighted average male and female death prevalence
+          summarize(pct_male_c = weighted.mean(pct_male_c, num_cases),
+                    pct_fem_c = weighted.mean(pct_fem_c, num_cases)),
+      # A segment of weighted average male and female death prevalence
           covid_table_groups %>%
             filter(!is.nan(pct_male_d)) %>%
-            summarize(pct_male_d = weighted.mean(pct_male_d, num_deaths),
-                      pct_fem_d = weighted.mean(pct_fem_d, num_deaths)))) %>%
+        summarize(pct_male_d = weighted.mean(pct_male_d, num_deaths),
+              pct_fem_d = weighted.mean(pct_fem_d, num_deaths)))) %>%
+  rename(`Level of disaggregation` = disaggregated_status, `Number of countries with data` = countries, `Cases` = num_cases, `Male cases (%)` = pct_male_c, `Female cases (%)` = pct_fem_c, `Deaths` = num_deaths, `Male deaths (%)` = pct_male_d, `Female deaths (%)` = pct_fem_d, `Countries with data as share of world population (%)` = share_pop) %>%
   knitr::kable()
 ```
 
+Table 1 summarizes the sex-disaggregated data available as of `r day` `r months(as.Date(str_c("2021-", month, "-", day)))` 2021. There were `r covid_table_groups %>% filter(disaggregated_status == "Both") %>% pull(countries)` countries reporting sex-disaggregated data for COVID-19 cases and deaths. (These include four nations of the United Kingdom – England, Wales, Scotland, and Northern Ireland – that are reported separately.) They represent `r round(covid_table_groups %>% filter(disaggregated_status == "Both") %>% pull(share_pop) * 100,0)` percent of the world’s population (2019 data). `r covid_table_groups %>% filter(disaggregated_status == "Deaths only") %>% pull(countries)` countries report sex-disaggregated data for deaths only. `r covid_table_groups %>% filter(disaggregated_status == "Cases only") %>% pull(countries)` more countries report sex-disaggregated data on cases but lack data on deaths. In total, `r round(covid_table_groups %>% summarize(total_pop = sum(share_pop, na.rm = TRUE))*100,0)`% of people now live in a country with at least some sex-disaggregated data on COVID-19. For countries reporting sex-disaggregated data on both cases and deaths, women make up `r round(covid_table_groups %>% filter(disaggregated_status == "Both") %>% pull(pct_fem_c)*100,0)` percent of cases but only `r round(covid_table_groups %>% filter(disaggregated_status == "Both") %>% pull(pct_fem_d)*100,0)` percent of deaths.
