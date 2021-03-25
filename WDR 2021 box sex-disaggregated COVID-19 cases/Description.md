@@ -1,4 +1,4 @@
-Description
+README
 ================
 
 This folder contains the information necessary to reproduce Figure
