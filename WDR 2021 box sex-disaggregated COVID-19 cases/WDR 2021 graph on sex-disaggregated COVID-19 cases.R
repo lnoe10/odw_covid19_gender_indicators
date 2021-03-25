@@ -3,9 +3,9 @@ library(tidyverse)
 # to see if they're sex-disaggregated
 
 # Read in stable OWID file from Dec 15
-wdr_graph_owid <- readRDS(file = "Input/Our World in Data Dec 15.rds")
+wdr_graph_owid <- readRDS(file = "WDR 2021 box sex-disaggregated COVID-19 cases/Our World in Data Dec 15.rds")
 # Read in stable GH5050 file from Dec 15
-wdr_graph_gh5050 <- readRDS(file = "Input/GH5050 historical Dec 15.rds")
+wdr_graph_gh5050 <- readRDS(file = "WDR 2021 box sex-disaggregated COVID-19 cases/GH5050 historical Dec 15.rds")
 avg_new_cases <- wdr_graph_owid %>%
   # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
   filter(!location %in% c("World", "International")) %>%
