@@ -1,8 +1,0 @@
----
-title: "ODW/Data2X WDR box 2021 description"
-author: "Lorenz Noe (Open Data Watch)"
-output: github_document
----
-
-## Description
-This folder contains the script and input files needed to reproduce Figure B2.3.1 in World Bank World Development Report 2021 as part of Box 2.3 on "Gender data and the COVID-19 pandemic" authored by Marya Buvinic (Data2X and Center for Global Development), Lorenz Noe (Open Data Watch), and Eric Swanson (Open Data Watch). Any questions can be addressed to lorenznoe@opendatawatch.com
