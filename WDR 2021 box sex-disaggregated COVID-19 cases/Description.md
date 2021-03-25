@@ -1,7 +1,6 @@
 ODW/Data2X WDR box 2021 description
 ================
-Lorenz
-3/25/2021
+Lorenz Noe (Open Data Watch)
 
 ## Description
 
