@@ -2,10 +2,13 @@ library(tidyverse)
 # Looking at average monthly new cases per month and use gh5050_historical
 # to see if they're sex-disaggregated
 
+# Stable Dec 15 files generated in "Scripts/Global Health 5050 data analysis.R" in repository "odw_covid19_gender_indicators"
 # Read in stable OWID file from Dec 15
 wdr_graph_owid <- readRDS(file = "WDR 2021 box sex-disaggregated COVID-19 cases/Our World in Data Dec 15.rds")
 # Read in stable GH5050 file from Dec 15
 wdr_graph_gh5050 <- readRDS(file = "WDR 2021 box sex-disaggregated COVID-19 cases/GH5050 historical Dec 15.rds")
+
+# Create df for average cases/deaths per month and whether or not they were sex-disaggregated
 avg_new_cases <- wdr_graph_owid %>%
   # Take out World aggregate and "International", which is no longer used (was for cruise ships, etc.)
   filter(!location %in% c("World", "International")) %>%
@@ -18,18 +21,19 @@ avg_new_cases <- wdr_graph_owid %>%
     TRUE ~ iso3c
   )) %>%
   mutate(month = lubridate::month(date)) %>%
+  # Compute average cases and deaths per month per country
   group_by(iso3c, month) %>%
   summarize(mean_new_cases = mean(new_cases, na.rm = TRUE),
             mean_new_deaths = mean(new_deaths, na.rm = TRUE)) %>%
   ungroup() %>%
-  # Sex-disaggregated cases yes/no
+  # Sex-disaggregated cases yes/no marker
   left_join(wdr_graph_gh5050 %>%
               as_tibble() %>%
               mutate(month = lubridate::month(date_cases)) %>%
               filter(!is.na(month)) %>%
               distinct(iso3c, month) %>%
               mutate(sex_disaggregated_cases = 1)) %>%
-  # Sex-disaggregated deaths yes/no
+  # Sex-disaggregated deaths yes/no marker
   left_join(wdr_graph_gh5050 %>%
               as_tibble() %>%
               mutate(month = lubridate::month(date_deaths)) %>%
@@ -37,7 +41,7 @@ avg_new_cases <- wdr_graph_owid %>%
               distinct(iso3c, month) %>%
               mutate(sex_disaggregated_deaths = 1))
 
-# Cases over time
+# Graph of cases over time for WDR2021
 avg_new_cases %>%
   group_by(month, sex_disaggregated_cases) %>%
   summarize(sum_cases = sum(mean_new_cases, na.rm = TRUE)) %>%
