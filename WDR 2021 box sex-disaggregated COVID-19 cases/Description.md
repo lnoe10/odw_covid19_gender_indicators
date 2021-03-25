@@ -1,6 +1,5 @@
 Description
 ================
-Lorenz Noe (Open Data Watch)
 
 This folder contains the information necessary to reproduce Figure
 B2.3.1 in Box 2.3 “Gender data and the COVID-19 pandemic” authored by
